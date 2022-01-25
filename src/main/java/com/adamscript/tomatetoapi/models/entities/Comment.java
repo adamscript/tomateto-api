@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
@@ -23,7 +24,7 @@ public class Comment implements Serializable{
     @NotNull
     private User userId;
 
-    private Date date;
+    private Instant date;
 
     @NotNull
     private String content;
@@ -34,7 +35,7 @@ public class Comment implements Serializable{
     public Comment(User userId, Date date, String content){
         this.commentId = UUID.randomUUID().toString();
         this.userId = userId;
-        this.date = date;
+        this.date = Instant.now();
         this.content = content;
     }
 
