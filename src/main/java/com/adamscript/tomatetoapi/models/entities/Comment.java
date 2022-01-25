@@ -1,4 +1,41 @@
 package com.adamscript.tomatetoapi.models.entities;
 
-public class Comment {
+import com.sun.istack.NotNull;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.UUID;
+
+@Entity
+@Getter @Setter @NoArgsConstructor
+@Table(name = "comment_tbl")
+public class Comment implements Serializable{
+
+    @Id
+    private String commentId;
+
+    @OneToOne
+    @NotNull
+    private User userId;
+
+    private Date date;
+
+    @NotNull
+    private String content;
+
+    @OneToMany
+    private ArrayList<User> likes = new ArrayList<>();
+
+    public Comment(User userId, Date date, String content){
+        this.commentId = UUID.randomUUID().toString();
+        this.userId = userId;
+        this.date = date;
+        this.content = content;
+    }
+
 }
