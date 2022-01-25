@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.ArrayList;
+import java.util.UUID;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
@@ -30,6 +31,7 @@ public class Library {
     private String cover;
 
     public Library(String title, String creator, String cover){
+        this.libraryId = UUID.randomUUID().toString();
         this.title = title;
         this.creator = creator;
         this.cover = cover;
