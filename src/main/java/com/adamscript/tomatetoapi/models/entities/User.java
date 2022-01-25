@@ -1,5 +1,6 @@
 package com.adamscript.tomatetoapi.models.entities;
 
+import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,9 +17,11 @@ public class User implements Serializable {
     @Id
     private String userId;
 
+    @NotNull
     @Column(length = 17)
     private String username;
 
+    @NotNull
     @Column(length = 30)
     private String displayName;
 
