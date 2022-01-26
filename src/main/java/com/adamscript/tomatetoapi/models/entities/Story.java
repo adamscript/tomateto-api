@@ -34,7 +34,7 @@ public class Story implements Serializable {
     @NotNull
     private String content;
 
-    public Story(Long id, User userId, Post postId, String content){
+    public Story(long id, User userId, Post postId, String content){
         this.id = id;
         this.userId = userId;
         this.date = Instant.now();

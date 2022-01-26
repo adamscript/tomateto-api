@@ -33,7 +33,7 @@ public class User implements Serializable {
 
     private String avatar;
 
-    public User(Long id, String username, String displayName, String bio, String avatar){
+    public User(long id, String username, String displayName, String bio, String avatar){
         this.id = id;
         this.username = username;
         this.date = Instant.now();

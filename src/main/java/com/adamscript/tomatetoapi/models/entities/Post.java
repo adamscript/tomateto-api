@@ -44,7 +44,7 @@ public class Post implements Serializable {
     @OneToMany(fetch = FetchType.LAZY)
     private List<User> like;
 
-    public Post(User userId, String status, Story storyId, Rating ratingId, List<Comment> comment, List<User> like){
+    public Post(long id, User userId, String status, Story storyId, Rating ratingId, List<Comment> comment, List<User> like){
         this.id = id;
         this.userId = userId;
         this.date = Instant.now();

@@ -26,7 +26,7 @@ public class Rating {
 
     private Integer rating;
 
-    public Rating(Long id, Library libraryId, User userId, Integer rating){
+    public Rating(long id, Library libraryId, User userId, Integer rating){
         this.id = id;
         this.libraryId = libraryId;
         this.userId = userId;

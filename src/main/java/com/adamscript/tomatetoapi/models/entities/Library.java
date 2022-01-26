@@ -28,7 +28,7 @@ public class Library {
 
     private String cover;
 
-    public Library(Long id, String title, String creator, String cover){
+    public Library(long id, String title, String creator, String cover){
         this.id = id;
         this.title = title;
         this.creator = creator;
