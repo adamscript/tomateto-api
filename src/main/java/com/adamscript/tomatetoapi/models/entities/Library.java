@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -23,8 +24,8 @@ public class Library {
 
     private String creator;
 
-    /*@OneToMany
-    private ArrayList<Rating> ratings = new ArrayList<>();*/
+    @OneToMany
+    private List<Rating> rating;
 
     private String cover;
 

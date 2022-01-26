@@ -11,7 +11,7 @@ import java.time.Instant;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
-@Table(name = "user")
+@Table(name = "account")
 public class User implements Serializable {
 
     @Id
@@ -33,10 +33,10 @@ public class User implements Serializable {
 
     private String avatar;
 
-    public User(long id, String username, String displayName, String bio, String avatar){
+    public User(long id, String username, Instant date,String displayName, String bio, String avatar){
         this.id = id;
         this.username = username;
-        this.date = Instant.now();
+        this.date = date;
         this.displayName = displayName;
         this.bio = bio;
         this.avatar = avatar;

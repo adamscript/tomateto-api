@@ -8,9 +8,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
@@ -42,6 +40,7 @@ public class Post implements Serializable {
     private List<Comment> comment;
 
     @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId")
     private List<User> like;
 
     public Post(long id, User userId, String status, Story storyId, Rating ratingId, List<Comment> comment, List<User> like){
