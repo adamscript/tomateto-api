@@ -5,37 +5,37 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
-@Table(name = "story_tbl")
+@Table(name = "story")
 public class Story implements Serializable {
 
     @Id
-    private String storyId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     @OneToOne
     @NotNull
+    @JoinColumn(name = "userId")
     private User userId;
 
     private Instant date;
 
     @OneToOne
     @NotNull
+    @JoinColumn(name = "postId")
     private Post postId;
 
     @NotNull
     private String content;
 
-    public Story(User userId, Post postId, String content){
-        this.storyId = UUID.randomUUID().toString();
+    public Story(Long id, User userId, Post postId, String content){
+        this.id = id;
         this.userId = userId;
         this.date = Instant.now();
         this.postId = postId;

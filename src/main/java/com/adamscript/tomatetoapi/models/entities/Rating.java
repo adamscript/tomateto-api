@@ -9,22 +9,25 @@ import java.util.UUID;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
-@Table(name = "rating_tbl")
+@Table(name = "rating")
 public class Rating {
 
     @Id
-    private String ratingId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     @OneToOne
+    @JoinColumn(name = "libraryId")
     private Library libraryId;
 
     @OneToOne
+    @JoinColumn(name = "userId")
     private User userId;
 
     private Integer rating;
 
-    public Rating(Library libraryId, User userId, Integer rating){
-        this.ratingId = UUID.randomUUID().toString();
+    public Rating(Long id, Library libraryId, User userId, Integer rating){
+        this.id = id;
         this.libraryId = libraryId;
         this.userId = userId;
         this.rating = rating;

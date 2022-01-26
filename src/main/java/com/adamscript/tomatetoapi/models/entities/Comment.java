@@ -10,11 +10,12 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
-@Table(name = "comment_tbl")
+@Table(name = "comment")
 public class Comment implements Serializable{
 
     @Id
@@ -23,18 +24,25 @@ public class Comment implements Serializable{
 
     private UUID commentId;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @NotNull
+    @JoinColumn(name = "userId")
     private User userId;
 
     private Instant date;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "postId")
+    private Post postId;
+
     @NotNull
     private String content;
 
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<User> likes;
+
     public Comment(long id, User userId, Date date, String content){
         this.id = id;
-        this.commentId = UUID.randomUUID();
         this.userId = userId;
         this.date = Instant.now();
         this.content = content;

@@ -12,11 +12,12 @@ import java.util.UUID;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
-@Table(name = "user_tbl")
+@Table(name = "user")
 public class User implements Serializable {
 
     @Id
-    private String userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     @NotNull
     @Column(length = 17)
@@ -33,8 +34,8 @@ public class User implements Serializable {
 
     private String avatar;
 
-    public User(String username, String displayName, String bio, String avatar){
-        this.userId = UUID.randomUUID().toString();
+    public User(Long id, String username, String displayName, String bio, String avatar){
+        this.id = id;
         this.username = username;
         this.date = Instant.now();
         this.displayName = displayName;
