@@ -18,7 +18,10 @@ import java.util.UUID;
 public class Comment implements Serializable{
 
     @Id
-    private String commentId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    private UUID commentId;
 
     @OneToOne
     @NotNull
@@ -29,11 +32,9 @@ public class Comment implements Serializable{
     @NotNull
     private String content;
 
-    @OneToMany
-    private ArrayList<User> likes = new ArrayList<>();
-
-    public Comment(User userId, Date date, String content){
-        this.commentId = UUID.randomUUID().toString();
+    public Comment(long id, User userId, Date date, String content){
+        this.id = id;
+        this.commentId = UUID.randomUUID();
         this.userId = userId;
         this.date = Instant.now();
         this.content = content;
