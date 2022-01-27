@@ -8,7 +8,9 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
@@ -19,12 +21,12 @@ public class Post implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @NotNull
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "userId", referencedColumnName = "id")
     private User userId;
 
-    private Instant date;
+    private Instant date = Instant.now();
 
     private String status;
 
@@ -36,13 +38,12 @@ public class Post implements Serializable {
     @JoinColumn(name = "ratingId")
     private Rating ratingId;
 
-    public Post(long id, User userId, String status, Story storyId, Rating ratingId, List<Comment> comment, List<User> like){
-        this.id = id;
-        this.userId = userId;
-        this.date = Instant.now();
-        this.status = status;
-        this.storyId = storyId;
-        this.ratingId = ratingId;
-    }
+    @ManyToMany
+    @JoinTable(
+            name = "postLike",
+            joinColumns = @JoinColumn(name = "postId"),
+            inverseJoinColumns = @JoinColumn(name = "userId")
+    )
+    Set<User> userLiked = new HashSet<>();
 
 }
