@@ -36,13 +36,6 @@ public class Post implements Serializable {
     @JoinColumn(name = "ratingId")
     private Rating ratingId;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<Comment> comment;
-
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
-    private List<User> like;
-
     public Post(long id, User userId, String status, Story storyId, Rating ratingId, List<Comment> comment, List<User> like){
         this.id = id;
         this.userId = userId;
@@ -50,8 +43,6 @@ public class Post implements Serializable {
         this.status = status;
         this.storyId = storyId;
         this.ratingId = ratingId;
-        this.comment = comment;
-        this.like = like;
     }
 
 }
