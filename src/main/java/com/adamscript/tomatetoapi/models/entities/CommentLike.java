@@ -28,11 +28,11 @@ public class CommentLike {
 
     private Instant date;
 
-    public CommentLike(long id, User userId, Post postId){
+    public CommentLike(long id, User userId, Post postId, Instant date) {
         this.id = id;
         this.userId = userId;
         this.commentId = commentId;
-        this.date = Instant.now();
-
+        this.date = date;
+    }
 }
 

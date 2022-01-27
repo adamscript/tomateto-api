@@ -26,11 +26,11 @@ public class PostLike {
 
     private Instant date;
 
-    public PostLike(long id, User userId, Post postId){
+    public PostLike(long id, User userId, Post postId, Instant date){
         this.id = id;
         this.userId = userId;
         this.postId = postId;
-        this.date = Instant.now();
+        this.date = date;
     }
 
 }
