@@ -46,4 +46,12 @@ public class Post implements Serializable {
     )
     Set<User> userLiked = new HashSet<>();
 
+    public void like(User user){
+        this.userLiked.add(user);
+    }
+
+    public void dislike(User user){
+        this.userLiked.remove(user);
+    }
+
 }

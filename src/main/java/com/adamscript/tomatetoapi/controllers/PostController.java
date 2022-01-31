@@ -25,15 +25,15 @@ public class PostController {
         return postService.insert(post);
     }
 
-    //liking a post
-    @PutMapping("/{id}/like")
-    public Post like(@RequestBody User userId, @PathVariable("id") Long postId){
+    //liking/disliking a post
+    @PutMapping("/{postId}/like/{userId}")
+    public Post like(@PathVariable("postId") Long postId, @PathVariable("userId") Long userId){
         return postService.like(postId, userId);
     }
 
     //disliking a post
-    @PutMapping("/{id}/dislike")
-    public void dislike(@RequestBody User userId, @PathVariable("id") Long postId){
+    @DeleteMapping ("/{postId}/like/{userId}")
+    public void dislike(@PathVariable("postId") Long postId, @PathVariable("userId") Long userId){
         postService.dislike(postId, userId);
     }
 

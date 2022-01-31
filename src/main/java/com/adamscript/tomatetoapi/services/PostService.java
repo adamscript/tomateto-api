@@ -3,6 +3,7 @@ package com.adamscript.tomatetoapi.services;
 import com.adamscript.tomatetoapi.models.entities.Post;
 import com.adamscript.tomatetoapi.models.entities.User;
 import com.adamscript.tomatetoapi.models.repos.PostRepository;
+import com.adamscript.tomatetoapi.models.repos.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,9 @@ public class PostService {
     @Autowired
     private PostRepository postRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     //fetch post content data
     public Post list(long id){
         return postRepository.findById(id).get();
@@ -26,20 +30,25 @@ public class PostService {
     }
 
     //liking a post
-    public Post like(Long postId, User userId){
+    public Post like(Long postId, Long userId){
 
         Post post = postRepository.findById(postId).get();
-        post.getUserLiked().add(userId);
+        User user = userRepository.findById(userId).get();
+
+        post.like(user);
 
         return postRepository.save(post);
     }
 
     //disliking a post
-    public void dislike(Long postId, User userId){
+    public void dislike(Long postId, Long userId){
 
         Post post = postRepository.findById(postId).get();
-        post.getUserLiked().remove(userId);
+        User user = userRepository.findById(userId).get();
 
+        post.dislike(user);
+
+        userRepository.save(user);
     }
 
     //deleting a post
