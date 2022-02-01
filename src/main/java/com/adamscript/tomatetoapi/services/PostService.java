@@ -48,7 +48,7 @@ public class PostService {
 
         post.dislike(user);
 
-        userRepository.save(user);
+        postRepository.save(post);
     }
 
     //deleting a post

@@ -31,12 +31,15 @@ public class PostController {
         return postService.like(postId, userId);
     }
 
-    //disliking a post
     @DeleteMapping ("/{postId}/like/{userId}")
     public void dislike(@PathVariable("postId") Long postId, @PathVariable("userId") Long userId){
         postService.dislike(postId, userId);
     }
 
     //deleting a post
+    @DeleteMapping("/{postId}/delete")
+    public void delete(@PathVariable("postId") Long postId){
+        postService.delete(postId);
+    }
 
 }
