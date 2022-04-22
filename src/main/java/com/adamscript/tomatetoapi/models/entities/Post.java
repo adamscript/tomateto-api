@@ -28,30 +28,14 @@ public class Post implements Serializable {
 
     private Instant date = Instant.now();
 
-    private String status;
+    private String content;
 
-    @OneToOne
-    @JoinColumn(name = "storyId")
-    private Story storyId;
+    private String picture;
 
-    @OneToOne
-    @JoinColumn(name = "ratingId")
-    private Rating ratingId;
+    private boolean isEdited;
 
-    @ManyToMany
-    @JoinTable(
-            name = "postLike",
-            joinColumns = @JoinColumn(name = "postId"),
-            inverseJoinColumns = @JoinColumn(name = "userId")
-    )
-    Set<User> userLiked = new HashSet<>();
+    private long likesCount;
 
-    public void like(User user){
-        this.userLiked.add(user);
-    }
-
-    public void dislike(User user){
-        this.userLiked.remove(user);
-    }
+    private long commentsCount;
 
 }
