@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
-@Table(name = "account")
+@Table(name = "users")
 public class User implements Serializable {
 
     @Id
@@ -25,7 +25,7 @@ public class User implements Serializable {
     @Column(length = 17)
     private String username;
 
-    private Instant date;
+    private Instant dateCreated;
 
     @NotNull
     @Column(length = 30)
@@ -36,17 +36,10 @@ public class User implements Serializable {
 
     private String avatar;
 
-    @JsonIgnore
-    @ManyToMany(mappedBy = "userLiked")
-    private Set<Post> postLiked = new HashSet<>();
+    private long followersCount;
 
-    public User(long id, String username, Instant date,String displayName, String bio, String avatar){
-        this.id = id;
-        this.username = username;
-        this.date = date;
-        this.displayName = displayName;
-        this.bio = bio;
-        this.avatar = avatar;
-    }
+    private long followCount;
+
+    private long postsCount;
 
 }
