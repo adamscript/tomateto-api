@@ -22,27 +22,21 @@ public class Comment implements Serializable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private UUID commentId;
-
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @NotNull
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "userId", referencedColumnName = "id")
     private User userId;
 
     private Instant date;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "postId")
+    @ManyToOne
+    @NotNull
+    @JoinColumn(name = "postId", referencedColumnName = "id")
     private Post postId;
 
     @NotNull
     private String content;
 
-    public Comment(long id, User userId, Date date, String content){
-        this.id = id;
-        this.userId = userId;
-        this.date = Instant.now();
-        this.content = content;
-    }
+    private long likesCount;
 
 }
