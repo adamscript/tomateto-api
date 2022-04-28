@@ -9,7 +9,9 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -36,10 +38,33 @@ public class User implements Serializable {
 
     private String avatar;
 
-    private long followersCount;
-
     private long followCount;
 
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "userFollow",
+            joinColumns = @JoinColumn(name = "userFollowing"),
+            inverseJoinColumns = @JoinColumn(name = "userFollowed")
+    )
+    private Set<User> follow = new HashSet<>();
+
+    private long followersCount;
+
+    @ManyToMany(mappedBy = "follow", fetch = FetchType.LAZY)
+    private Set<User> followers = new HashSet<>();
+
     private long postsCount;
+
+    @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Post> post = new HashSet<>();
+
+    @ManyToMany(mappedBy = "likes")
+    private Set<Post> likedPosts = new HashSet<>();
+
+    @OneToMany(mappedBy = "userId")
+    private Set<Comment> comment = new HashSet<>();
+
+    @ManyToMany(mappedBy = "likes")
+    private Set<Comment> likedComments = new HashSet<>();
 
 }

@@ -8,10 +8,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
@@ -38,5 +35,13 @@ public class Comment implements Serializable{
     private String content;
 
     private long likesCount;
+
+    @ManyToMany
+    @JoinTable(
+            name = "commentLikes",
+            joinColumns = @JoinColumn(name = "commentId"),
+            inverseJoinColumns = @JoinColumn(name = "userId")
+    )
+    private Set<User> likes = new HashSet<>();
 
 }

@@ -36,6 +36,17 @@ public class Post implements Serializable {
 
     private long likesCount;
 
+    @ManyToMany
+    @JoinTable(
+            name = "postLikes",
+            joinColumns = @JoinColumn(name = "postId"),
+            inverseJoinColumns = @JoinColumn(name = "userId")
+    )
+    private Set<User> likes = new HashSet<>();
+
     private long commentsCount;
+
+    @OneToMany(mappedBy = "postId")
+    private Set<Comment> comments = new HashSet<>();
 
 }
