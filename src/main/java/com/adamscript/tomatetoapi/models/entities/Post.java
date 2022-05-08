@@ -1,5 +1,9 @@
 package com.adamscript.tomatetoapi.models.entities;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +26,7 @@ public class Post implements Serializable {
     private long id;
 
     @ManyToOne
+    @JsonManagedReference
     @NotNull
     @JoinColumn(name = "userId", referencedColumnName = "id")
     private User userId;
@@ -37,6 +42,7 @@ public class Post implements Serializable {
     private long likesCount;
 
     @ManyToMany
+    @JsonManagedReference
     @JoinTable(
             name = "postLikes",
             joinColumns = @JoinColumn(name = "postId"),
