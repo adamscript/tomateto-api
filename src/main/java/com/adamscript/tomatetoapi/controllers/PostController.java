@@ -25,17 +25,6 @@ public class PostController {
         return postService.insert(post);
     }
 
-    //liking/disliking a post
-    @PutMapping("/{postId}/like/{userId}")
-    public Post like(@PathVariable("postId") Long postId, @PathVariable("userId") Long userId){
-        return postService.like(postId, userId);
-    }
-
-    @DeleteMapping ("/{postId}/like/{userId}")
-    public void dislike(@PathVariable("postId") Long postId, @PathVariable("userId") Long userId){
-        postService.dislike(postId, userId);
-    }
-
     //deleting a post
     @DeleteMapping("/{postId}/delete")
     public void delete(@PathVariable("postId") Long postId){
