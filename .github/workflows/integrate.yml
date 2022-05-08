@@ -1,0 +1,26 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches:
+      - integrate
+
+jobs:
+  run_tests:
+    name: Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the Repository
+        uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@1
+        with:
+          java-version: '11'
+      - name: Cache Maven Packages
+        uses: actions/cache@2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Run Tests
+        run: mvn -B test
