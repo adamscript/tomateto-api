@@ -1,6 +1,6 @@
 package com.adamscript.tomatetoapi.models.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
 import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +27,7 @@ public class User implements Serializable {
     @Column(length = 17)
     private String username;
 
-    private Instant dateCreated;
+    private Instant date;
 
     @NotNull
     @Column(length = 30)
@@ -40,6 +40,7 @@ public class User implements Serializable {
 
     private long followCount;
 
+    @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "userFollow",
@@ -50,20 +51,24 @@ public class User implements Serializable {
 
     private long followersCount;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "follow", fetch = FetchType.LAZY)
     private Set<User> followers = new HashSet<>();
 
     private long postsCount;
-
+    @JsonBackReference
     @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Post> post = new HashSet<>();
 
+    @JsonBackReference
     @ManyToMany(mappedBy = "likes")
     private Set<Post> likedPosts = new HashSet<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "userId")
     private Set<Comment> comment = new HashSet<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "likes")
     private Set<Comment> likedComments = new HashSet<>();
 
