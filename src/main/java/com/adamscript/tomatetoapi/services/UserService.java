@@ -17,7 +17,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    //fetch post content data
+    //fetch post content data//
     public User list(long id){
         return userRepository.findById(id).get();
     };
