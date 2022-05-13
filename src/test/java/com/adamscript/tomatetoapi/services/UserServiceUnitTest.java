@@ -24,13 +24,20 @@ class UserServiceUnitTest {
     }
 
     @Test
-    void listUserInformation() {
+    void getUserInformation() {
         User user = new User();
-        user.setUsername("adamscript");
-        user.setDisplayName("Adam Darmawan");
+        user.setUsername("eyesocketdisc");
+        user.setDisplayName("EyeSocketDisc");
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
 
         assertThat(userService.list(1)).isNotNull();
+    }
+
+    @Test
+    void ifUserNotFound_thenReturnsNull() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThat(userService.list(1)).isNull();
     }
 }
