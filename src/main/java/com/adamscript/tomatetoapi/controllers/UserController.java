@@ -3,6 +3,8 @@ package com.adamscript.tomatetoapi.controllers;
 import com.adamscript.tomatetoapi.models.entities.User;
 import com.adamscript.tomatetoapi.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -15,14 +17,14 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/{id}")
-    public Optional<User> listById(@PathVariable("id") Long id){
+    public ResponseEntity listById(@PathVariable("id") Long id){
         Optional<User> user = userService.list(id);
 
         if(user != null){
-            return user;
+            return new ResponseEntity(user, HttpStatus.OK);
         }
         else{
-            return null;
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
     }
 
