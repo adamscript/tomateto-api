@@ -29,28 +29,6 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    //liking a post
-    public Post like(Long postId, Long userId){
-
-        Post post = postRepository.findById(postId).get();
-        User user = userRepository.findById(userId).get();
-
-        post.like(user);
-
-        return postRepository.save(post);
-    }
-
-    //disliking a post
-    public void dislike(Long postId, Long userId){
-
-        Post post = postRepository.findById(postId).get();
-        User user = userRepository.findById(userId).get();
-
-        post.dislike(user);
-
-        postRepository.save(post);
-    }
-
     //deleting a post
     public void delete(long id){
         postRepository.deleteById(id);
