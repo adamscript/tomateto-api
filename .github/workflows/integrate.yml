@@ -9,14 +9,32 @@ jobs:
   run_tests:
     name: Testing
     runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_DB: tomateto-db
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: root
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
     steps:
       - name: Checkout the Repository
         uses: actions/checkout@v3
+        
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: '11'
           distribution: 'temurin'
           cache: maven
+          
       - name: Run Tests
         run: mvn -B test --file pom.xml
