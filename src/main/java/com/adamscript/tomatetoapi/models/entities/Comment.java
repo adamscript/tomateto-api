@@ -1,5 +1,7 @@
 package com.adamscript.tomatetoapi.models.entities;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +14,10 @@ import java.util.*;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id"
+)
 @Table(name = "comment")
 public class Comment implements Serializable{
 
