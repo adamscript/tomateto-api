@@ -9,7 +9,7 @@ import org.mockito.Mockito;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 class UserServiceUnitTest {
@@ -39,5 +39,43 @@ class UserServiceUnitTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThat(userService.list(1)).isNull();
+    }
+
+    @Test
+    void insertNewUser() {
+        User user = new User();
+
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenReturn(user);
+
+        Optional<User> newUser = userService.insert(user);
+
+        assertThat(newUser).isNotNull();
+    }
+
+    @Test
+    void ifUsernameAlreadyExists_thenReturnsError() {
+        User user = new User();
+        user.setUsername("eyesocketdisc");
+        user.setDisplayName("EyeSocketDisc");
+
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+
+        assertThat(userService.insert(user)).isNull();
+    }
+
+    @Test
+    void editUser() {
+
+    }
+
+    @Test
+    void ifUsernameDoesNotExists_thenReturnsError() {
+
+    }
+
+    @Test
+    void ifNullValue_thenReturnsError() {
+
     }
 }

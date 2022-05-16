@@ -28,5 +28,17 @@ public class UserController {
         }
     }
 
+    @PostMapping
+    public ResponseEntity insert(@RequestBody User user){
+        Optional<User> insertedUser = userService.insert(user);
+
+        if(insertedUser != null){
+            return new ResponseEntity(insertedUser, HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity(HttpStatus.CONFLICT);
+        }
+    }
+
 
 }

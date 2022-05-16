@@ -18,6 +18,10 @@ import java.util.Set;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id"
+)
 @Table(name = "post")
 public class Post implements Serializable {
 
@@ -26,7 +30,6 @@ public class Post implements Serializable {
     private long id;
 
     @ManyToOne
-    @JsonManagedReference
     @NotNull
     @JoinColumn(name = "userId", referencedColumnName = "id")
     private User userId;
@@ -42,7 +45,6 @@ public class Post implements Serializable {
     private long likesCount;
 
     @ManyToMany
-    @JsonManagedReference
     @JoinTable(
             name = "postLikes",
             joinColumns = @JoinColumn(name = "postId"),

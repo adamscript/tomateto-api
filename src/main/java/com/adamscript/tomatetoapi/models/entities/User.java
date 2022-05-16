@@ -16,6 +16,10 @@ import java.util.Set;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id"
+)
 @Table(name = "users")
 public class User implements Serializable {
 
@@ -40,7 +44,7 @@ public class User implements Serializable {
 
     private long followCount;
 
-    @JsonIgnore
+    //@JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "userFollow",
@@ -51,24 +55,20 @@ public class User implements Serializable {
 
     private long followersCount;
 
-    @JsonIgnore
+    //@JsonIgnore
     @ManyToMany(mappedBy = "follow", fetch = FetchType.LAZY)
     private Set<User> followers = new HashSet<>();
 
     private long postsCount;
-    @JsonBackReference
     @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Post> post = new HashSet<>();
 
-    @JsonBackReference
     @ManyToMany(mappedBy = "likes")
     private Set<Post> likedPosts = new HashSet<>();
 
-    @JsonIgnore
     @OneToMany(mappedBy = "userId")
     private Set<Comment> comment = new HashSet<>();
 
-    @JsonIgnore
     @ManyToMany(mappedBy = "likes")
     private Set<Comment> likedComments = new HashSet<>();
 
