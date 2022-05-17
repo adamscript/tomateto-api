@@ -13,8 +13,7 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -98,6 +97,33 @@ class UserControllerTest {
     @Test
     void ifNullValue_thenReturns400() throws Exception {
 
+    }
+
+    @Test
+    void followAUser() throws Exception {
+        User user1 = new User();
+        User user2 = new User();
+
+        when(userService.follow(anyLong(), anyLong())).thenReturn(Optional.of(user1));
+
+        mockMvc.perform(put("/api/user/{id}/follow", user2.getId())
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(user1)))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void whenFollow_ifUserInvalid_thenReturns400() throws Exception {
+        User user = new User();
+
+        when(userService.follow(anyLong(), anyLong())).thenReturn(null);
+
+        mockMvc.perform(put("/api/user/{id}/follow", 4L)
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(user)))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
 }

@@ -78,4 +78,37 @@ class UserServiceUnitTest {
     void ifNullValue_thenReturnsError() {
 
     }
+
+    @Test
+    void followAUser() {
+        User user1 = new User();
+        user1.setId(4);
+
+        User user2 = new User();
+        user2.setId(5);
+
+        when(userRepository.findById(4L)).thenReturn(Optional.of(user1));
+        when(userRepository.findById(5L)).thenReturn(Optional.of(user2));
+
+        assertThat(userService.follow(4L, 5L)).isNotNull();
+    }
+
+    @Test
+    void ifFollowingYourself_thenReturnsError() {
+        User user = new User();
+
+        when(userRepository.findById(4L)).thenReturn(Optional.of(user));
+
+        assertThat(userService.follow(4L, 4L)).isNull();
+    }
+
+    @Test
+    void ifFollowingNonExistingUser_thenReturnsError() {
+        User user = new User();
+
+        when(userRepository.findById(4L)).thenReturn(Optional.of(user));
+        when(userRepository.findById(5L)).thenReturn(Optional.empty());
+
+        assertThat(userService.follow(4L, 5L)).isNull();
+    }
 }
