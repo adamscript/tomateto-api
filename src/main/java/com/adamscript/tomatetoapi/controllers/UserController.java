@@ -40,5 +40,19 @@ public class UserController {
         }
     }
 
+    @PutMapping("/{id}/follow")
+    public ResponseEntity follow(@RequestBody User userFollowing, @PathVariable("id") Long userFollowedId){
+        Long userFollowingId = userFollowing.getId();
+
+        Optional<User> user = userService.follow(userFollowingId, userFollowedId);
+
+        if(user != null){
+            return new ResponseEntity(user, HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+
+    };
 
 }

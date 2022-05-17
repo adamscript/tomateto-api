@@ -38,6 +38,21 @@ public class UserService {
             System.out.println("User already registered!");
             return null;
         }
+    }
 
+    //follow a user
+    public Optional<User> follow(Long userFollowingId, Long userFollowedId) {
+        //validate if user exists
+        Optional<User> userFollowing = userRepository.findById(userFollowingId);
+        Optional<User> userFollowed = userRepository.findById(userFollowedId);
+
+        if(userFollowingId != userFollowedId && userFollowed.isPresent() && userFollowing.isPresent()){
+            userRepository.followUser(userFollowingId, userFollowedId);
+            return userRepository.findById(userFollowingId);
+        }
+        else{
+            System.out.println("User does not exists or you are trying to follow yourself");
+            return null;
+        }
     }
 }
