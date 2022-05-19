@@ -25,10 +25,28 @@ public class PostController {
         return postService.insert(post);
     }
 
+    @PutMapping
+    public Post edit(@RequestBody Post post) {
+        return postService.edit(post);
+    }
+
     //deleting a post
     @DeleteMapping("/{postId}/delete")
     public void delete(@PathVariable("postId") Long postId){
         postService.delete(postId);
     }
 
+    @PutMapping("/{id}/like")
+    public void like(@PathVariable("id") long postId, @RequestBody User user){
+        long userId = user.getId();
+
+        postService.like(postId, userId);
+    }
+
+    @PutMapping("/{id}/unlike")
+    public void unlike(@PathVariable("id") long postId, @RequestBody User user){
+        long userId = user.getId();
+
+        postService.unlike(postId, userId);
+    }
 }
