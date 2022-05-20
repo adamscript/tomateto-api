@@ -28,8 +28,11 @@ public class UserController {
         if(response.getCode() == 0){
             return new ResponseEntity(response, HttpStatus.OK);
         }
-        else{
+        else if(response.getCode() == 100){
             return new ResponseEntity(response, HttpStatus.NOT_FOUND);
+        }
+        else{
+            return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -40,17 +43,23 @@ public class UserController {
         if(response.getCode() == 0){
             return new ResponseEntity(response, HttpStatus.OK);
         }
-        else{
+        else if(response.getCode() == 101){
             return new ResponseEntity(response, HttpStatus.CONFLICT);
+        }
+        else{
+            return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
         }
     }
 
     @PutMapping
     public ResponseEntity edit(@RequestBody User user){
-        Response response = userService.edit( user);
+        Response response = userService.edit(user);
 
         if(response.getCode() == 0){
             return new ResponseEntity(response, HttpStatus.OK);
+        }
+        else if(response.getCode() == 102){
+            return new ResponseEntity(response, HttpStatus.NOT_FOUND);
         }
         else{
             return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
