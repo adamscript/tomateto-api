@@ -1,7 +1,9 @@
 package com.adamscript.tomatetoapi.controllers;
 
+import com.adamscript.tomatetoapi.helpers.handler.Response;
 import com.adamscript.tomatetoapi.models.entities.User;
 import com.adamscript.tomatetoapi.services.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,29 +16,53 @@ import java.util.Optional;
 public class UserController {
 
     @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
     private UserService userService;
 
     @GetMapping("/{id}")
     public ResponseEntity listById(@PathVariable("id") Long id){
-        Optional<User> user = userService.list(id);
+        Response response = userService.list(id);
 
-        if(user != null){
-            return new ResponseEntity(user, HttpStatus.OK);
+        if(response.getCode() == 0){
+            return new ResponseEntity(response, HttpStatus.OK);
+        }
+        else if(response.getCode() == 100){
+            return new ResponseEntity(response, HttpStatus.NOT_FOUND);
         }
         else{
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping
     public ResponseEntity insert(@RequestBody User user){
-        Optional<User> insertedUser = userService.insert(user);
+        Response response = userService.insert(user);
 
-        if(insertedUser != null){
-            return new ResponseEntity(insertedUser, HttpStatus.OK);
+        if(response.getCode() == 0){
+            return new ResponseEntity(response, HttpStatus.OK);
+        }
+        else if(response.getCode() == 101){
+            return new ResponseEntity(response, HttpStatus.CONFLICT);
         }
         else{
-            return new ResponseEntity(HttpStatus.CONFLICT);
+            return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping
+    public ResponseEntity edit(@RequestBody User user){
+        Response response = userService.edit(user);
+
+        if(response.getCode() == 0){
+            return new ResponseEntity(response, HttpStatus.OK);
+        }
+        else if(response.getCode() == 102){
+            return new ResponseEntity(response, HttpStatus.NOT_FOUND);
+        }
+        else{
+            return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -44,15 +70,29 @@ public class UserController {
     public ResponseEntity follow(@RequestBody User userFollowing, @PathVariable("id") Long userFollowedId){
         Long userFollowingId = userFollowing.getId();
 
-        Optional<User> user = userService.follow(userFollowingId, userFollowedId);
+        Response response = userService.follow(userFollowingId, userFollowedId);
 
-        if(user != null){
-            return new ResponseEntity(user, HttpStatus.OK);
+        if(response.getCode() == 0){
+            return new ResponseEntity(response, HttpStatus.OK);
         }
         else{
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
         }
 
     };
+
+    @PutMapping("/{id}/unfollow")
+    public ResponseEntity unfollow(@RequestBody User userFollowing, @PathVariable("id") Long userFollowedId){
+        Long userFollowingId = userFollowing.getId();
+
+        Response response = userService.unfollow(userFollowingId, userFollowedId);
+
+        if(response.getCode() == 0){
+            return new ResponseEntity(response, HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
+        }
+    }
 
 }

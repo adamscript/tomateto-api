@@ -42,4 +42,39 @@ public class UserRepositoryTest {
 
     }
 
+    @Test
+    void unfollowAUser() {
+        User user1 = new User();
+        entityManager.persist(user1);
+
+        User user2 = new User();
+        entityManager.persist(user2);
+
+        userRepository.followUser(user1.getId(), user2.getId());
+        userRepository.unfollowUser(user1.getId(), user2.getId());
+
+        Optional<User> followingUser = userRepository.findById(user1.getId());
+        Optional<User> followedUser = userRepository.findById(user2.getId());
+
+        assertThat(followingUser.get().getFollow()).isEqualTo(Set.of());
+        assertThat(followedUser.get().getFollowers()).isEqualTo(Set.of());
+
+    }
+
+    @Test
+    void findFollow() {
+        User user1 = new User();
+        entityManager.persist(user1);
+
+        User user2 = new User();
+        entityManager.persist(user2);
+
+        userRepository.followUser(user1.getId(), user2.getId());
+
+        Optional<User> followingUser = userRepository.findById(user1.getId());
+
+        assertThat(userRepository.findFollow(user1.getId(), Optional.of(user2))).isNotNull().isEqualTo(List.of(followingUser.get()));
+
+    }
+
 }
