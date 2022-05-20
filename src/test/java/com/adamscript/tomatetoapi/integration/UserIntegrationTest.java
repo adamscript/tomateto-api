@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
+@Transactional
 @AutoConfigureMockMvc
 public class UserIntegrationTest {
 
@@ -40,21 +42,26 @@ public class UserIntegrationTest {
 
     @Test
     void getUserInformation() throws Exception {
+        User user = new User();
+        user.setUsername("eyesocketdisc");
+        user.setDisplayName("EyeSocketDisc");
 
-        User user = userRepository.findById(1L).get();
+        userRepository.saveAndFlush(user);
 
-        mockMvc.perform(get("/api/user/{id}", 1)
+        User foundUser = userRepository.findById(user.getId()).get();
+
+        mockMvc.perform(get("/api/user/{id}", foundUser.getId())
                         .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value(user.getUsername()));
+                .andExpect(jsonPath("$.items.username").value(user.getUsername()));
 
     }
 
     @Test
     void insertNewUser() throws Exception {
         User user = new User();
-        user.setUsername("eyesocketdisc");
+        user.setUsername("eyesocketdisc2");
         user.setDisplayName("EyeSocketDisc");
 
         mockMvc.perform(post("/api/user")
@@ -62,12 +69,28 @@ public class UserIntegrationTest {
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value(user.getUsername()));
+                .andExpect(jsonPath("$.items.username").value(user.getUsername()));
     }
 
     @Test
     void editUser() throws Exception {
+        User user = new User();
+        user.setUsername("eyesocketdisc");
+        user.setDisplayName("EyeSocketDisc");
 
+        userRepository.saveAndFlush(user);
+
+        User editedUser = new User();
+        editedUser.setId(user.getId());
+        editedUser.setUsername("eyesocketdisc2");
+        editedUser.setDisplayName(user.getDisplayName());
+
+        mockMvc.perform(put("/api/user")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(editedUser)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items.username").value(editedUser.getUsername()));
     }
 
     @Test
@@ -77,6 +100,23 @@ public class UserIntegrationTest {
         userRepository.saveAll(List.of(user1, user2));
 
         mockMvc.perform(put("/api/user/{id}/follow", user2.getId())
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(user1)))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void unfollowAUser() throws Exception {
+        User user1 = new User();
+        User user2 = new User();
+        userRepository.saveAll(List.of(user1, user2));
+
+        //follow newly created users first
+        userRepository.followUser(user1.getId(), user2.getId());
+
+        //then unfollow them
+        mockMvc.perform(put("/api/user/{id}/unfollow", user2.getId())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user1)))
                 .andDo(print())
