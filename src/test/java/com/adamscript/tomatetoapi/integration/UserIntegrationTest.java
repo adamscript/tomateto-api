@@ -9,15 +9,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -30,10 +26,6 @@ public class UserIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private EntityManager entityManager;
-
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -48,9 +40,7 @@ public class UserIntegrationTest {
 
         userRepository.saveAndFlush(user);
 
-        User foundUser = userRepository.findById(user.getId()).get();
-
-        mockMvc.perform(get("/api/user/{id}", foundUser.getId())
+        mockMvc.perform(get("/api/user/{id}", user.getId())
                         .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -104,6 +94,11 @@ public class UserIntegrationTest {
                         .content(objectMapper.writeValueAsString(user1)))
                 .andDo(print())
                 .andExpect(status().isOk());
+
+        User followingUser = userRepository.findById(user1.getId()).get();
+
+        //check if user successfully followed
+        assertThat(userRepository.findFollow(user1.getId(), Optional.of(user2))).isNotNull().isEqualTo(List.of(followingUser));
     }
 
     @Test
@@ -121,6 +116,9 @@ public class UserIntegrationTest {
                         .content(objectMapper.writeValueAsString(user1)))
                 .andDo(print())
                 .andExpect(status().isOk());
+
+        //check if user successfully unfollowed
+        assertThat(userRepository.findFollow(user1.getId(), Optional.of(user2))).isEqualTo(List.of());
     }
 
 }
