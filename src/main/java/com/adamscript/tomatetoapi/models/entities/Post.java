@@ -33,6 +33,7 @@ public class Post implements Serializable {
 
     private Instant date = Instant.now();
 
+    @NotNull
     private String content;
 
     private String picture;

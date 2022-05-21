@@ -100,7 +100,7 @@ class UserControllerTest {
     void ifUsernameAlreadyExists_thenReturns409() throws Exception {
         User user = new User();
 
-        Response response = new Response(null, ServiceStatus.USERNAME_ALREADY_EXISTS);
+        Response response = new Response(null, ServiceStatus.USERNAME_ALREADY_EXIST);
 
         when(userService.insert(any(User.class))).thenReturn(response);
 
@@ -148,7 +148,7 @@ class UserControllerTest {
     void ifUsernameDoesNotExists_thenReturns404() throws Exception {
         User user = new User();
 
-        Response response = new Response(null, ServiceStatus.USER_DOES_NOT_EXISTS);
+        Response response = new Response(null, ServiceStatus.USER_DOES_NOT_EXIST                                  );
 
         when(userService.edit(any(User.class))).thenReturn(response);
 
