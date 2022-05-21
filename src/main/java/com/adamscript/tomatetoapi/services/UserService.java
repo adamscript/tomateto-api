@@ -43,7 +43,7 @@ public class UserService {
             return new Response(null, ServiceStatus.DISPLAYNAME_EMPTY);
         }
         else if (insertedUser.isPresent()){
-            return new Response(null, ServiceStatus.USERNAME_ALREADY_EXISTS);
+            return new Response(null, ServiceStatus.USERNAME_ALREADY_EXIST);
         }
         else if (insertedUser.isEmpty()) {
             User savedUser = userRepository.save(user);
@@ -64,7 +64,7 @@ public class UserService {
             return new Response(null, ServiceStatus.DISPLAYNAME_EMPTY);
         }
         else if (insertedUser.isEmpty()){
-            return new Response(null, ServiceStatus.USER_DOES_NOT_EXISTS);
+            return new Response(null, ServiceStatus.USER_DOES_NOT_EXIST);
         }
         else if (insertedUser.isPresent()) {
             //maintain user info before saving the update
