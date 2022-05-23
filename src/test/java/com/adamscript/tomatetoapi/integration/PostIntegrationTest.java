@@ -43,11 +43,13 @@ public class PostIntegrationTest {
     private User user;
 
     @BeforeEach
-    void initPostController(){
+    void initPostIntegration(){
         user = new User();
         user.setId(1);
         user.setUsername("eyesocketdisc");
         user.setDisplayName("EyeSocketDisc");
+
+        userRepository.saveAndFlush(user);
     }
 
     @Test
