@@ -67,8 +67,6 @@ class PostServiceUnitTest {
     void whenInsert_ifUserNull_thenReturnsError(){
         Post post = new Post();
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
-
         assertThat(postService.insert(post).getCode()).isEqualTo(202);
     }
 
@@ -85,6 +83,8 @@ class PostServiceUnitTest {
         Post post = new Post();
         post.setUserId(user);
         post.setContent("Hi tomates! This is my first tomathought");
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThat(postService.insert(post).getCode()).isEqualTo(102);
     }

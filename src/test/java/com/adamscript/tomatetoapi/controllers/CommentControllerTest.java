@@ -2,9 +2,10 @@ package com.adamscript.tomatetoapi.controllers;
 
 import com.adamscript.tomatetoapi.helpers.handler.Response;
 import com.adamscript.tomatetoapi.helpers.service.ServiceStatus;
+import com.adamscript.tomatetoapi.models.entities.Comment;
 import com.adamscript.tomatetoapi.models.entities.Post;
 import com.adamscript.tomatetoapi.models.entities.User;
-import com.adamscript.tomatetoapi.services.PostService;
+import com.adamscript.tomatetoapi.services.CommentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,12 +20,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PostController.class)
-public class PostControllerTest {
+@WebMvcTest(CommentController.class)
+public class CommentControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -33,137 +35,112 @@ public class PostControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private PostService postService;
+    private CommentService commentService;
 
     private User user;
+    private Post post;
 
     @BeforeEach
-    void initPostController(){
+    void initCommentController(){
         user = new User();
-        user.setId(1);
+        user.setId(3);
         user.setUsername("eyesocketdisc");
         user.setDisplayName("EyeSocketDisc");
+
+        post = new Post();
+        post.setId(4);
+        post.setUserId(user);
+        post.setContent("Hi tomates! This is my first tomathought");
     }
 
     @Test
-    void getPostInformation() throws Exception {
-        Post post = new Post();
-        post.setUserId(user);
-        post.setContent("Hi tomates! This is my first tomathought");
+    void getCommentInformation() throws Exception {
+        Comment comment = new Comment();
+        comment.setUserId(user);
+        comment.setPostId(post);
+        comment.setContent("And this is my first mini-tomathought, aka comment! ;)");
 
-        Response response = new Response(post, ServiceStatus.SUCCESS);
+        Response response = new Response(comment, ServiceStatus.SUCCESS);
 
-        when(postService.list(anyLong())).thenReturn(response);
+        when(commentService.list(anyLong())).thenReturn(response);
 
-        MvcResult mvcResult = mockMvc.perform(get("/api/post/{id}", 1)
+        MvcResult mvcResult = mockMvc.perform(get("/api/comment/{id}", 1)
                         .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.items.content").value(post.getContent()))
+                .andExpect(jsonPath("$.items.content").value(comment.getContent()))
                 .andReturn();
 
         assertThat(mvcResult.getResponse().getContentAsString()).isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(response));
     }
 
     @Test
-    void ifPostNotFound_thenReturns404() throws Exception {
-        Response response = new Response(null, ServiceStatus.POST_NOT_FOUND);
+    void ifCommentNotFound_thenReturns404() throws Exception {
+        Response response = new Response(null, ServiceStatus.COMMENT_NOT_FOUND);
 
-        when(postService.list(anyLong())).thenReturn(response);
+        when(commentService.list(anyLong())).thenReturn(response);
 
-        mockMvc.perform(get("/api/post/{id}", 3)
+        mockMvc.perform(get("/api/comment/{id}", 3)
                         .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    void whenGetPost_ifFails_thenReturns400() throws Exception {
+    void whenGetComment_ifFails_thenReturns400() throws Exception {
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(postService.list(anyLong())).thenReturn(response);
+        when(commentService.list(anyLong())).thenReturn(response);
 
-        mockMvc.perform(get("/api/post/{id}", 3)
+        mockMvc.perform(get("/api/comment/{id}", 3)
                         .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void insertNewPost() throws Exception {
-        Post post = new Post();
-        post.setUserId(user);
-        post.setContent("Hi tomates! This is my first tomathought");
+    void insertNewComment() throws Exception {
+        Comment comment = new Comment();
+        comment.setUserId(user);
+        comment.setPostId(post);
+        comment.setContent("And this is my first mini-tomathought, aka comment! ;)");
 
-        Response response = new Response(post, ServiceStatus.SUCCESS);
+        Response response = new Response(comment, ServiceStatus.SUCCESS);
 
-        when(postService.insert(any(Post.class))).thenReturn(response);
+        when(commentService.insert(any(Comment.class))).thenReturn(response);
 
-        mockMvc.perform(post("/api/post")
+        mockMvc.perform(post("/api/comment")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(post)))
+                        .content(objectMapper.writeValueAsString(comment)))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.items.content").value(post.getContent()));
+                .andExpect(jsonPath("$.items.content").value(comment.getContent()));
     }
 
     @Test
     void whenInsert_ifFails_thenReturns400() throws Exception {
-        Post post = new Post();
+        Comment comment = new Comment();
 
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(postService.insert(any(Post.class))).thenReturn(response);
+        when(commentService.insert(any(Comment.class))).thenReturn(response);
 
-        mockMvc.perform(post("/api/post")
+        mockMvc.perform(post("/api/comment")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(post)))
+                        .content(objectMapper.writeValueAsString(comment)))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void editPost() throws Exception {
-        Post post = new Post();
-        post.setUserId(user);
-        post.setContent("Hi tomates! This is my first tomathought");
-
-        Response response = new Response(post, ServiceStatus.SUCCESS);
-
-        when(postService.edit(any(Post.class))).thenReturn(response);
-
-        mockMvc.perform(put("/api/post")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(post)))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.items.content").value(post.getContent()));
-    }
-
-    @Test
-    void whenEdit_ifFails_thenReturns400() throws Exception {
-        Post post = new Post();
-
-        Response response = new Response(null, ServiceStatus.ERROR);
-
-        when(postService.edit(any(Post.class))).thenReturn(response);
-
-        mockMvc.perform(put("/api/post")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(post)))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void likePost() throws Exception {
-        Post post = new Post();
+    void likeComment() throws Exception {
+        Comment comment = new Comment();
 
         Response response = new Response(null, ServiceStatus.SUCCESS);
 
-        when(postService.like(anyLong(), anyLong())).thenReturn(response);
+        when(commentService.like(anyLong(), anyLong())).thenReturn(response);
 
-        mockMvc.perform(put("/api/post/{id}/like", post.getId())
+        mockMvc.perform(put("/api/comment/{id}/like", comment.getId())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -171,14 +148,14 @@ public class PostControllerTest {
     }
 
     @Test
-    void whenLike_ifPostNotFound_thenReturns404() throws Exception {
-        Post post = new Post();
+    void whenLike_ifCommentNotFound_thenReturns404() throws Exception {
+        Comment comment = new Comment();
 
-        Response response = new Response(null, ServiceStatus.POST_NOT_FOUND);
+        Response response = new Response(null, ServiceStatus.COMMENT_NOT_FOUND);
 
-        when(postService.like(anyLong(), anyLong())).thenReturn(response);
+        when(commentService.like(anyLong(), anyLong())).thenReturn(response);
 
-        mockMvc.perform(put("/api/post/{id}/like", post.getId())
+        mockMvc.perform(put("/api/comment/{id}/like", comment.getId())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -187,13 +164,13 @@ public class PostControllerTest {
 
     @Test
     void whenLike_ifFails_thenReturns400() throws Exception {
-        Post post = new Post();
+        Comment comment = new Comment();
 
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(postService.like(anyLong(), anyLong())).thenReturn(response);
+        when(commentService.like(anyLong(), anyLong())).thenReturn(response);
 
-        mockMvc.perform(put("/api/post/{id}/like", post.getId())
+        mockMvc.perform(put("/api/comment/{id}/like", comment.getId())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -201,14 +178,14 @@ public class PostControllerTest {
     }
 
     @Test
-    void unlikePost() throws Exception {
-        Post post = new Post();
+    void unlikeComment() throws Exception {
+        Comment comment = new Comment();
 
         Response response = new Response(null, ServiceStatus.SUCCESS);
 
-        when(postService.unlike(anyLong(), anyLong())).thenReturn(response);
+        when(commentService.unlike(anyLong(), anyLong())).thenReturn(response);
 
-        mockMvc.perform(put("/api/post/{id}/unlike", post.getId())
+        mockMvc.perform(put("/api/comment/{id}/unlike", comment.getId())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -217,13 +194,13 @@ public class PostControllerTest {
 
     @Test
     void whenUnlike_ifFails_thenReturns400() throws Exception {
-        Post post = new Post();
+        Comment comment = new Comment();
 
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(postService.unlike(anyLong(), anyLong())).thenReturn(response);
+        when(commentService.unlike(anyLong(), anyLong())).thenReturn(response);
 
-        mockMvc.perform(put("/api/post/{id}/unlike", post.getId())
+        mockMvc.perform(put("/api/comment/{id}/unlike", comment.getId())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -231,24 +208,24 @@ public class PostControllerTest {
     }
 
     @Test
-    void deletePost() throws Exception {
+    void deleteComment() throws Exception {
         Response response = new Response(null, ServiceStatus.SUCCESS);
 
-        when(postService.delete(anyLong())).thenReturn(response);
+        when(commentService.delete(anyLong())).thenReturn(response);
 
-        mockMvc.perform(delete("/api/post/{id}/delete", 1)
+        mockMvc.perform(delete("/api/comment/{id}/delete", 1)
                         .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
 
     @Test
-    void whenDelete_ifPostNotFound_thenReturns404() throws Exception {
-        Response response = new Response(null, ServiceStatus.POST_NOT_FOUND);
+    void whenDelete_ifCommentNotFound_thenReturns404() throws Exception {
+        Response response = new Response(null, ServiceStatus.COMMENT_NOT_FOUND);
 
-        when(postService.delete(anyLong())).thenReturn(response);
+        when(commentService.delete(anyLong())).thenReturn(response);
 
-        mockMvc.perform(delete("/api/post/{id}/delete", 1)
+        mockMvc.perform(delete("/api/comment/{id}/delete", 1)
                         .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isNotFound());
@@ -258,11 +235,12 @@ public class PostControllerTest {
     void whenDelete_ifFails_thenReturns400() throws Exception {
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(postService.delete(anyLong())).thenReturn(response);
+        when(commentService.delete(anyLong())).thenReturn(response);
 
-        mockMvc.perform(delete("/api/post/{id}/delete", 1)
+        mockMvc.perform(delete("/api/comment/{id}/delete", 1)
                         .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
+    
 }

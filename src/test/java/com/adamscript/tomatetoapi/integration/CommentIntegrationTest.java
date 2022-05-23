@@ -1,7 +1,9 @@
 package com.adamscript.tomatetoapi.integration;
 
+import com.adamscript.tomatetoapi.models.entities.Comment;
 import com.adamscript.tomatetoapi.models.entities.Post;
 import com.adamscript.tomatetoapi.models.entities.User;
+import com.adamscript.tomatetoapi.models.repos.CommentRepository;
 import com.adamscript.tomatetoapi.models.repos.PostRepository;
 import com.adamscript.tomatetoapi.models.repos.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.transaction.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -26,134 +27,124 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
-public class PostIntegrationTest {
+public class CommentIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;
-
+    
     @Autowired
-    private PostRepository postRepository;
+    private CommentRepository commentRepository;
 
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PostRepository postRepository;
+
     private User user;
+    private Post post;
 
     @BeforeEach
-    void initPostIntegration(){
+    void initCommentIntegration(){
         user = new User();
-        user.setId(1);
         user.setUsername("eyesocketdisc");
         user.setDisplayName("EyeSocketDisc");
 
-        userRepository.saveAndFlush(user);
-    }
-
-    @Test
-    void getPostInformation() throws Exception{
-        Post post = new Post();
+        post = new Post();
         post.setUserId(user);
         post.setContent("Hi tomates! This is my first tomathought");
 
+        userRepository.saveAndFlush(user);
         postRepository.saveAndFlush(post);
+    }
 
-        mockMvc.perform(get("/api/post/{id}", post.getId())
+    @Test
+    void getCommentInformation() throws Exception{
+        Comment comment = new Comment();
+        comment.setUserId(user);
+        comment.setPostId(post);
+        comment.setContent("And this is my first mini-tomathought, aka comment! ;)");
+
+        commentRepository.saveAndFlush(comment);
+
+        mockMvc.perform(get("/api/comment/{id}", comment.getId())
                         .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.items.content").value(post.getContent()));
+                .andExpect(jsonPath("$.items.content").value(comment.getContent()));
     }
 
     @Test
-    void insertNewPost() throws Exception{
-        Post post = new Post();
-        post.setUserId(user);
-        post.setContent("Hi tomates! This is my first tomathought");
+    void insertNewComment() throws Exception{
+        Comment comment = new Comment();
+        comment.setUserId(user);
+        comment.setPostId(post);
+        comment.setContent("And this is my first mini-tomathought, aka comment! ;)");
 
-        mockMvc.perform(post("/api/post")
+        mockMvc.perform(post("/api/comment")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(post)))
+                        .content(objectMapper.writeValueAsString(comment)))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.items.content").value(post.getContent()));
+                .andExpect(jsonPath("$.items.content").value(comment.getContent()));
     }
 
     @Test
-    void editPost() throws Exception{
-        Post post = new Post();
-        post.setUserId(user);
-        post.setContent("Hi tomates! This is my first tomathought");
-
-        postRepository.saveAndFlush(post);
-
-        Post editedPost = new Post();
-        editedPost.setId(post.getId());
-        editedPost.setContent("Hello tomates! This is my first tomathought");
-
-        mockMvc.perform(put("/api/post")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(editedPost)))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.items.content").value(editedPost.getContent()));
-    }
-
-    @Test
-    void likePost() throws Exception{
-        Post post = new Post();
+    void likeComment() throws Exception{
+        Comment comment = new Comment();
         User user = new User();
 
-        postRepository.save(post);
+        commentRepository.save(comment);
         userRepository.save(user);
 
-        mockMvc.perform(put("/api/post/{id}/like", post.getId())
+        mockMvc.perform(put("/api/comment/{id}/like", comment.getId())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        Post likedPost = postRepository.findById(post.getId()).get();
+        Comment likedComment = commentRepository.findById(comment.getId()).get();
 
-        //check if post successfully liked
-        assertThat(postRepository.findLike(post.getId(), Optional.of(user))).isNotNull().isEqualTo(List.of(likedPost));
+        //check if comment successfully liked
+        assertThat(commentRepository.findLike(comment.getId(), Optional.of(user))).isNotNull().isEqualTo(List.of(likedComment));
     }
 
     @Test
-    void unlikePost() throws Exception{
-        Post post = new Post();
+    void unlikeComment() throws Exception{
+        Comment comment = new Comment();
         User user = new User();
 
-        postRepository.save(post);
+        commentRepository.save(comment);
         userRepository.save(user);
 
-        //like newly created post first
-        postRepository.likePost(post.getId(), user.getId());
+        //like newly created comment first
+        commentRepository.likeComment(comment.getId(), user.getId());
 
         //then unlike it
-        mockMvc.perform(put("/api/post/{id}/unlike", post.getId())
+        mockMvc.perform(put("/api/comment/{id}/unlike", comment.getId())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        //check if post successfully unliked
-        assertThat(postRepository.findLike(post.getId(), Optional.of(user))).isEqualTo(List.of());
+        //check if comment successfully unliked
+        assertThat(commentRepository.findLike(comment.getId(), Optional.of(user))).isEqualTo(List.of());
     }
 
     @Test
-    void deletePost() throws Exception{
-        Post post = new Post();
-        postRepository.saveAndFlush(post);
+    void deleteComment() throws Exception{
+        Comment comment = new Comment();
+        commentRepository.saveAndFlush(comment);
 
-        mockMvc.perform(delete("/api/post/{id}/delete", post.getId())
+        mockMvc.perform(delete("/api/comment/{id}/delete", comment.getId())
                         .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        assertThat(postRepository.findById(post.getId())).isEqualTo(Optional.empty());
+        assertThat(commentRepository.findById(comment.getId())).isEqualTo(Optional.empty());
     }
-
+    
 }
