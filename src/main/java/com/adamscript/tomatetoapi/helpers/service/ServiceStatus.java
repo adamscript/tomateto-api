@@ -22,7 +22,7 @@ public enum ServiceStatus {
 
     //Post
     POST_NOT_FOUND(200, "Post not found"),
-    POST_DOES_NOT_EXIST(201, "Post does not exist (Invalid Post ID"),
+    POST_DOES_NOT_EXIST(201, "Post does not exist (Invalid Post ID)"),
     POST_USER_EMPTY(202, "Post's user can't be empty"),
     POST_CONTENT_EMPTY(203, "Post's content can't be empty"),
     POST_LIKED_ALREADY(204, "Post already liked"),
@@ -30,11 +30,12 @@ public enum ServiceStatus {
 
     //Comment
     COMMENT_NOT_FOUND(300, "Comment not found"),
-    COMMENT_DOES_NOT_EXIST(301, "Comment does not exist (Invalid Comment ID"),
+    COMMENT_DOES_NOT_EXIST(301, "Comment does not exist (Invalid Comment ID)"),
     COMMENT_USER_EMPTY(302, "Comment's user can't be empty"),
-    COMMENT_CONTENT_EMPTY(303, "Comment's content can't be empty"),
-    COMMENT_LIKED_ALREADY(304, "Comment already liked"),
-    COMMENT_NOT_LIKED(305, "Comment not liked"),
+    COMMENT_POST_EMPTY(303, "Comment's post can't be empty"),
+    COMMENT_CONTENT_EMPTY(304, "Comment's content can't be empty"),
+    COMMENT_LIKED_ALREADY(305, "Comment already liked"),
+    COMMENT_NOT_LIKED(306, "Comment not liked"),
 
     //Unknown
     ERROR(400, "An unknown error occurred");
