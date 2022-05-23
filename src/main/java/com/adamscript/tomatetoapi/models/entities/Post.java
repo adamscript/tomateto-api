@@ -10,12 +10,12 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
 @JsonIdentityInfo(
+        scope = Post.class,
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id"
 )

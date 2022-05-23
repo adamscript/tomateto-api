@@ -9,14 +9,13 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
 @Getter @Setter @NoArgsConstructor
 @JsonIdentityInfo(
+        scope = User.class,
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id"
 )
