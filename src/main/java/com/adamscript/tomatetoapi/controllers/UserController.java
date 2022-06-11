@@ -20,7 +20,7 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/{id}")
-    public ResponseEntity listById(@PathVariable("id") Long id){
+    public ResponseEntity listById(@PathVariable("id") String id){
         Response response = userService.list(id);
 
         if(response.getCode() == 0){
@@ -65,8 +65,8 @@ public class UserController {
     }
 
     @PutMapping("/{id}/follow")
-    public ResponseEntity follow(@RequestBody User userFollowing, @PathVariable("id") Long userFollowedId){
-        Long userFollowingId = userFollowing.getId();
+    public ResponseEntity follow(@RequestBody User userFollowing, @PathVariable("id") String userFollowedId){
+        String userFollowingId = userFollowing.getId();
 
         Response response = userService.follow(userFollowingId, userFollowedId);
 
@@ -80,8 +80,8 @@ public class UserController {
     };
 
     @PutMapping("/{id}/unfollow")
-    public ResponseEntity unfollow(@RequestBody User userFollowing, @PathVariable("id") Long userFollowedId){
-        Long userFollowingId = userFollowing.getId();
+    public ResponseEntity unfollow(@RequestBody User userFollowing, @PathVariable("id") String userFollowedId){
+        String userFollowingId = userFollowing.getId();
 
         Response response = userService.unfollow(userFollowingId, userFollowedId);
 
@@ -91,6 +91,46 @@ public class UserController {
         else{
             return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/follows")
+    public ResponseEntity listFollows(){
+        return new ResponseEntity(userService.listFollows(), HttpStatus.OK);
+    }
+
+    @GetMapping("/followers")
+    public ResponseEntity listFollowers(){
+        return new ResponseEntity(userService.listFollowers(), HttpStatus.OK);
+    }
+
+    @GetMapping("/explore")
+    public ResponseEntity listAll(){
+        return new ResponseEntity(userService.listAll(), HttpStatus.OK);
+    }
+
+    @GetMapping("/nonfollows")
+    public ResponseEntity listNonFollows(){
+        return new ResponseEntity(userService.listNonFollows(), HttpStatus.OK);
+    }
+
+    @GetMapping("/profile/{username}")
+    public ResponseEntity listProfile(@PathVariable("username") String username){
+        return new ResponseEntity(userService.listProfile(username), HttpStatus.OK);
+    }
+
+    @GetMapping("/profile/{id}/posts")
+    public ResponseEntity listProfilePost(@PathVariable("id") String id){
+        return new ResponseEntity(userService.listProfilePost(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/profile/{id}/comments")
+    public ResponseEntity listProfileComment(@PathVariable("id") String id){
+        return new ResponseEntity(userService.listProfileComment(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/profile/{id}/liked")
+    public ResponseEntity listProfileLiked(@PathVariable("id") String id){
+        return new ResponseEntity(userService.listProfileLiked(id), HttpStatus.OK);
     }
 
 }

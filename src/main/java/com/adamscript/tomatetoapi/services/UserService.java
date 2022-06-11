@@ -2,7 +2,10 @@ package com.adamscript.tomatetoapi.services;
 
 import com.adamscript.tomatetoapi.helpers.handler.Response;
 import com.adamscript.tomatetoapi.helpers.service.ServiceStatus;
+import com.adamscript.tomatetoapi.models.dto.FeedUserDTO;
 import com.adamscript.tomatetoapi.models.entities.User;
+import com.adamscript.tomatetoapi.models.repos.CommentRepository;
+import com.adamscript.tomatetoapi.models.repos.PostRepository;
 import com.adamscript.tomatetoapi.models.repos.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +21,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     //fetch user information//
-    public Response list(long id) {
+    public Response list(String id) {
         Optional<User> user = userRepository.findById(id);
 
         if (user.isPresent()) {
@@ -88,7 +91,7 @@ public class UserService {
     }
 
     //follow a user
-    public Response follow(Long userFollowingId, Long userFollowedId) {
+    public Response follow(String userFollowingId, String userFollowedId) {
         //validate if user exists
         Optional<User> userFollowing = userRepository.findById(userFollowingId);
         Optional<User> userFollowed = userRepository.findById(userFollowedId);
@@ -117,7 +120,7 @@ public class UserService {
     }
 
     //unfollow a user
-    public Response unfollow(Long userFollowingId, Long userFollowedId) {
+    public Response unfollow(String userFollowingId, String userFollowedId) {
         Optional<User> userFollowed = userRepository.findById(userFollowedId);
 
         List<User> userFollow = userRepository.findFollow(userFollowingId, userFollowed);
@@ -132,5 +135,55 @@ public class UserService {
         else{
             return new Response(null, ServiceStatus.ERROR);
         }
+    }
+
+    public Response listFollows(){
+        Optional<User> user = userRepository.findById("1");
+
+        List<FeedUserDTO> userFollows = userRepository.findFollows(user);
+
+        return new Response(userFollows, ServiceStatus.SUCCESS);
+    }
+
+    public Response listFollowers(){
+        Optional<User> user = userRepository.findById("1");
+
+        List<FeedUserDTO> userFollowers = userRepository.findFollowers(user);
+
+        return new Response(userFollowers, ServiceStatus.SUCCESS);
+    }
+
+    public Response listNonFollows(){
+        Optional<User> user = userRepository.findById("1");
+
+        List<FeedUserDTO> userFollows = userRepository.findNonFollows(user);
+
+        return new Response(userFollows, ServiceStatus.SUCCESS);
+    }
+
+    public Response listAll(){
+        return new Response(userRepository.findAllUsers(), ServiceStatus.SUCCESS);
+    }
+
+    public Response listProfile(String username){
+        return new Response(userRepository.findProfileByUsername(username), ServiceStatus.SUCCESS);
+    }
+
+    public Response listProfilePost(String id){
+        User user = userRepository.findById(id).get();
+
+        return new Response(userRepository.findPostByUser(user), ServiceStatus.SUCCESS);
+    }
+
+    public Response listProfileComment(String id){
+        User user = userRepository.findById(id).get();
+
+        return new Response(userRepository.findCommentByUser(user), ServiceStatus.SUCCESS);
+    }
+
+    public Response listProfileLiked(String id){
+        User user = userRepository.findById(id).get();
+
+        return new Response(userRepository.findLikedByUser(user), ServiceStatus.SUCCESS);
     }
 }

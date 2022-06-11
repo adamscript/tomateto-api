@@ -31,16 +31,16 @@ class UserServiceUnitTest {
         user.setUsername("eyesocketdisc");
         user.setDisplayName("EyeSocketDisc");
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
 
-        assertThat(userService.list(1).getCode()).isEqualTo(0);
+        assertThat(userService.list("1").getCode()).isEqualTo(0);
     }
 
     @Test
     void ifUserNotFound_thenReturnsError() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(userRepository.findById(anyString())).thenReturn(Optional.empty());
 
-        assertThat(userService.list(1).getCode()).isEqualTo(100);
+        assertThat(userService.list("1").getCode()).isEqualTo(100);
     }
 
     @Test
@@ -81,7 +81,7 @@ class UserServiceUnitTest {
         user.setUsername("eyesocketdisc");
         user.setDisplayName("EyeSocketDisc");
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
 
         assertThat(userService.edit(user).getCode()).isEqualTo(0);
     }
@@ -92,7 +92,7 @@ class UserServiceUnitTest {
         user.setUsername("eyesocketdisc");
         user.setDisplayName("EyeSocketDisc");
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(userRepository.findById(anyString())).thenReturn(Optional.empty());
 
         assertThat(userService.edit(user).getCode()).isEqualTo(102);
     }
@@ -112,70 +112,70 @@ class UserServiceUnitTest {
     @Test
     void followAUser() {
         User user1 = new User();
-        user1.setId(4);
+        user1.setId("4");
 
         User user2 = new User();
-        user2.setId(5);
+        user2.setId("5");
 
-        when(userRepository.findById(4L)).thenReturn(Optional.of(user1));
-        when(userRepository.findById(5L)).thenReturn(Optional.of(user2));
+        when(userRepository.findById("4L")).thenReturn(Optional.of(user1));
+        when(userRepository.findById("5L")).thenReturn(Optional.of(user2));
 
-        assertThat(userService.follow(4L, 5L).getCode()).isEqualTo(0);
+        assertThat(userService.follow("4L", "5L").getCode()).isEqualTo(0);
     }
 
     @Test
     void ifFollowingYourself_thenReturnsError() {
         User user = new User();
 
-        when(userRepository.findById(4L)).thenReturn(Optional.of(user));
+        when(userRepository.findById("4L")).thenReturn(Optional.of(user));
 
-        assertThat(userService.follow(4L, 4L).getCode()).isEqualTo(105);
+        assertThat(userService.follow("4L", "4L").getCode()).isEqualTo(105);
     }
 
     @Test
     void ifFollowingNonExistingUser_thenReturnsError() {
         User user = new User();
 
-        when(userRepository.findById(4L)).thenReturn(Optional.of(user));
-        when(userRepository.findById(5L)).thenReturn(Optional.empty());
+        when(userRepository.findById("4L")).thenReturn(Optional.of(user));
+        when(userRepository.findById("5L")).thenReturn(Optional.empty());
 
-        assertThat(userService.follow(4L, 5L).getCode()).isEqualTo(106);
+        assertThat(userService.follow("4L", "5L").getCode()).isEqualTo(106);
     }
 
     @Test
     void ifFollowerUserDoesNotExist_thenReturnsError() {
         User user = new User();
 
-        when(userRepository.findById(4L)).thenReturn(Optional.of(user));
-        when(userRepository.findById(5L)).thenReturn(Optional.empty());
+        when(userRepository.findById("4L")).thenReturn(Optional.of(user));
+        when(userRepository.findById("5L")).thenReturn(Optional.empty());
 
-        assertThat(userService.follow(5L, 4L).getCode()).isEqualTo(107);
+        assertThat(userService.follow("5L", "4L").getCode()).isEqualTo(107);
     }
 
     @Test
     void ifAlreadyFollowed_thenReturnsError() {
         User user = new User();
 
-        when(userRepository.findById(4L)).thenReturn(Optional.of(user));
-        when(userRepository.findById(5L)).thenReturn(Optional.of(user));
-        when(userRepository.findFollow(anyLong(), any())).thenReturn(List.of(user));
+        when(userRepository.findById("4L")).thenReturn(Optional.of(user));
+        when(userRepository.findById("5L")).thenReturn(Optional.of(user));
+        when(userRepository.findFollow(anyString(), any())).thenReturn(List.of(user));
 
-        assertThat(userService.follow(4L, 5L).getCode()).isEqualTo(108);
+        assertThat(userService.follow("4L", "5L").getCode()).isEqualTo(108);
     }
 
     @Test
     void unfollowAUser() {
         User user = new User();
 
-        when(userRepository.findFollow(anyLong(), any())).thenReturn(List.of(user));
+        when(userRepository.findFollow(anyString(), any())).thenReturn(List.of(user));
 
-        assertThat(userService.unfollow(4L, 5L).getCode()).isEqualTo(0);
+        assertThat(userService.unfollow("4L", "5L").getCode()).isEqualTo(0);
     }
 
     @Test
     void ifAlreadyUnfollowed_thenReturnsError(){
-        when(userRepository.findFollow(anyLong(), any())).thenReturn(List.of());
+        when(userRepository.findFollow(anyString(), any())).thenReturn(List.of());
 
-        assertThat(userService.unfollow(4L, 5L).getCode()).isEqualTo(109);
+        assertThat(userService.unfollow("4L", "5L").getCode()).isEqualTo(109);
     }
 }

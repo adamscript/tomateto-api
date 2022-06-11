@@ -28,15 +28,15 @@ public class Comment implements Serializable{
 
     @ManyToOne
     @NotNull
-    @JoinColumn(name = "userId", referencedColumnName = "id")
-    private User userId;
+    @JoinColumn(name = "users", referencedColumnName = "id")
+    private User user;
 
     private Instant date;
 
     @ManyToOne
     @NotNull
-    @JoinColumn(name = "postId", referencedColumnName = "id")
-    private Post postId;
+    @JoinColumn(name = "post", referencedColumnName = "id")
+    private Post post;
 
     @NotNull
     private String content;
@@ -46,8 +46,8 @@ public class Comment implements Serializable{
     @ManyToMany
     @JoinTable(
             name = "commentLikes",
-            joinColumns = @JoinColumn(name = "commentId"),
-            inverseJoinColumns = @JoinColumn(name = "userId")
+            joinColumns = @JoinColumn(name = "comment"),
+            inverseJoinColumns = @JoinColumn(name = "users")
     )
     private Set<User> likes = new HashSet<>();
 

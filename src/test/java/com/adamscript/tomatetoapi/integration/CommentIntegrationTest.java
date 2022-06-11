@@ -54,7 +54,7 @@ public class CommentIntegrationTest {
         user.setDisplayName("EyeSocketDisc");
 
         post = new Post();
-        post.setUserId(user);
+        post.setUser(user);
         post.setContent("Hi tomates! This is my first tomathought");
 
         userRepository.saveAndFlush(user);
@@ -64,8 +64,8 @@ public class CommentIntegrationTest {
     @Test
     void getCommentInformation() throws Exception{
         Comment comment = new Comment();
-        comment.setUserId(user);
-        comment.setPostId(post);
+        comment.setUser(user);
+        comment.setPost(post);
         comment.setContent("And this is my first mini-tomathought, aka comment! ;)");
 
         commentRepository.saveAndFlush(comment);
@@ -80,8 +80,8 @@ public class CommentIntegrationTest {
     @Test
     void insertNewComment() throws Exception{
         Comment comment = new Comment();
-        comment.setUserId(user);
-        comment.setPostId(post);
+        comment.setUser(user);
+        comment.setPost(post);
         comment.setContent("And this is my first mini-tomathought, aka comment! ;)");
 
         mockMvc.perform(post("/api/comment")

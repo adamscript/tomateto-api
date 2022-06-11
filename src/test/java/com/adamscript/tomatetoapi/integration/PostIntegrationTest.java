@@ -45,7 +45,7 @@ public class PostIntegrationTest {
     @BeforeEach
     void initPostIntegration(){
         user = new User();
-        user.setId(1);
+        user.setId("1");
         user.setUsername("eyesocketdisc");
         user.setDisplayName("EyeSocketDisc");
 
@@ -55,7 +55,7 @@ public class PostIntegrationTest {
     @Test
     void getPostInformation() throws Exception{
         Post post = new Post();
-        post.setUserId(user);
+        post.setUser(user);
         post.setContent("Hi tomates! This is my first tomathought");
 
         postRepository.saveAndFlush(post);
@@ -70,7 +70,7 @@ public class PostIntegrationTest {
     @Test
     void insertNewPost() throws Exception{
         Post post = new Post();
-        post.setUserId(user);
+        post.setUser(user);
         post.setContent("Hi tomates! This is my first tomathought");
 
         mockMvc.perform(post("/api/post")
@@ -84,7 +84,7 @@ public class PostIntegrationTest {
     @Test
     void editPost() throws Exception{
         Post post = new Post();
-        post.setUserId(user);
+        post.setUser(user);
         post.setContent("Hi tomates! This is my first tomathought");
 
         postRepository.saveAndFlush(post);

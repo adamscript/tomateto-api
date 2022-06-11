@@ -4,12 +4,14 @@ import com.adamscript.tomatetoapi.helpers.handler.Response;
 import com.adamscript.tomatetoapi.helpers.service.ServiceStatus;
 import com.adamscript.tomatetoapi.models.entities.Post;
 import com.adamscript.tomatetoapi.models.entities.User;
+import com.adamscript.tomatetoapi.models.repos.CommentRepository;
 import com.adamscript.tomatetoapi.models.repos.PostRepository;
 import com.adamscript.tomatetoapi.models.repos.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +20,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+
     private final UserRepository userRepository;
 
     //fetch post content data
@@ -37,14 +40,14 @@ public class PostService {
 
     //create post
     public Response insert(Post post){
-        if(post.getUserId() == null){
+        if(post.getUser() == null){
             return new Response(null, ServiceStatus.POST_USER_EMPTY);
         }
         else if(post.getContent() == null){
             return new Response(null, ServiceStatus.POST_CONTENT_EMPTY);
         }
-        else if(post.getUserId() != null && post.getContent() != null){
-            Optional<User> user = userRepository.findById(post.getUserId().getId());
+        else if(post.getUser() != null && post.getContent() != null){
+            Optional<User> user = userRepository.findById(post.getUser().getId());
 
             if(user.isEmpty()){
                 return new Response(null, ServiceStatus.USER_DOES_NOT_EXIST);
@@ -75,7 +78,7 @@ public class PostService {
             return new Response(null, ServiceStatus.POST_DOES_NOT_EXIST);
         }
         else if(insertedPost.isPresent()){
-            post.setUserId(insertedPost.get().getUserId());
+            post.setUser(insertedPost.get().getUser());
             post.setPicture(insertedPost.get().getPicture());
             post.setDate(insertedPost.get().getDate());
             post.setLikesCount(insertedPost.get().getLikesCount());
@@ -92,7 +95,7 @@ public class PostService {
     }
 
     //like a post
-    public Response like(long postId, long userId){
+    public Response like(long postId, String userId){
         Optional<User> user = userRepository.findById(userId);
         Optional<Post> post = postRepository.findById(postId);
 
@@ -117,7 +120,7 @@ public class PostService {
     }
 
     //unlike a post
-    public Response unlike(long postId, long userId){
+    public Response unlike(long postId, String userId){
         Optional<User> user = userRepository.findById(userId);
 
         List<Post> likedPost = postRepository.findLike(postId, user);
@@ -148,5 +151,17 @@ public class PostService {
         else{
             return new Response(null, ServiceStatus.ERROR);
         }
+    }
+
+    public Response listContent(long id){
+        Post post = postRepository.findById(id).get();
+
+        return new Response(postRepository.findContent(post), ServiceStatus.SUCCESS);
+    }
+
+    public Response listContentComment(long id){
+        Post post = postRepository.findById(id).get();
+
+        return new Response(postRepository.findCommentByPost(post), ServiceStatus.SUCCESS);
     }
 }

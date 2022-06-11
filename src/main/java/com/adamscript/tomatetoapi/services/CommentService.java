@@ -41,18 +41,18 @@ public class CommentService {
 
     //create comment
     public Response insert(Comment comment){
-        if(comment.getUserId() == null){
+        if(comment.getUser() == null){
             return new Response(null, ServiceStatus.COMMENT_USER_EMPTY);
         }
-        else if(comment.getPostId() == null){
+        else if(comment.getPost() == null){
             return new Response(null, ServiceStatus.COMMENT_POST_EMPTY);
         }
         else if(comment.getContent() == null){
             return new Response(null, ServiceStatus.COMMENT_CONTENT_EMPTY);
         }
-        else if(comment.getUserId() != null && comment.getPostId() != null && comment.getContent() != null){
-            Optional<User> user = userRepository.findById(comment.getUserId().getId());
-            Optional<Post> post = postRepository.findById(comment.getPostId().getId());
+        else if(comment.getUser() != null && comment.getPost() != null && comment.getContent() != null){
+            Optional<User> user = userRepository.findById(comment.getUser().getId());
+            Optional<Post> post = postRepository.findById(comment.getPost().getId());
 
             if(user.isEmpty()){
                 return new Response(null, ServiceStatus.USER_DOES_NOT_EXIST);
@@ -73,7 +73,7 @@ public class CommentService {
     }
 
     //like a comment
-    public Response like(long commentId, long userId){
+    public Response like(long commentId, String userId){
         Optional<User> user = userRepository.findById(userId);
         Optional<Comment> comment = commentRepository.findById(commentId);
 
@@ -98,7 +98,7 @@ public class CommentService {
     }
 
     //unlike a comment
-    public Response unlike(long commentId, long userId){
+    public Response unlike(long commentId, String userId){
         Optional<User> user = userRepository.findById(userId);
 
         List<Comment> likedComment = commentRepository.findLike(commentId, user);

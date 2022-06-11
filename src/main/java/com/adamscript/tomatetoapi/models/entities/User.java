@@ -23,8 +23,8 @@ import java.util.Set;
 public class User implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @NotNull
+    private String id;
 
     @NotNull
     @Column(length = 17)
@@ -59,13 +59,13 @@ public class User implements Serializable {
     private Set<User> followers = new HashSet<>();
 
     private long postsCount;
-    @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Post> post = new HashSet<>();
 
     @ManyToMany(mappedBy = "likes")
     private Set<Post> likedPosts = new HashSet<>();
 
-    @OneToMany(mappedBy = "userId")
+    @OneToMany(mappedBy = "user")
     private Set<Comment> comment = new HashSet<>();
 
     @ManyToMany(mappedBy = "likes")

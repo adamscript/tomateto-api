@@ -14,8 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 public class CommentServiceUnitTest {
@@ -38,15 +37,15 @@ public class CommentServiceUnitTest {
         user.setDisplayName("EyeSocketDisc");
 
         post = new Post();
-        post.setUserId(user);
+        post.setUser(user);
         post.setContent("Hi tomates! This is my first tomathought");
     }
 
     @Test
     void getCommentInformation(){
         Comment comment = new Comment();
-        comment.setUserId(user);
-        comment.setPostId(post);
+        comment.setUser(user);
+        comment.setPost(post);
         comment.setContent("And this is my first mini-tomathought, aka comment! ;)");
 
         when(commentRepository.findById(anyLong())).thenReturn(Optional.of(comment));
@@ -64,11 +63,11 @@ public class CommentServiceUnitTest {
     @Test
     void insertNewComment(){
         Comment comment = new Comment();
-        comment.setUserId(user);
-        comment.setPostId(post);
+        comment.setUser(user);
+        comment.setPost(post);
         comment.setContent("And this is my first mini-tomathought, aka comment! ;)");
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
         when(commentRepository.save(comment)).thenReturn(comment);
 
@@ -85,7 +84,7 @@ public class CommentServiceUnitTest {
     @Test
     void whenInsert_ifPostNull_thenReturnsError(){
         Comment comment = new Comment();
-        comment.setUserId(user);
+        comment.setUser(user);
 
         assertThat(commentService.insert(comment).getCode()).isEqualTo(303);
     }
@@ -93,8 +92,8 @@ public class CommentServiceUnitTest {
     @Test
     void whenInsert_ifContentNull_thenReturnsError(){
         Comment comment = new Comment();
-        comment.setUserId(user);
-        comment.setPostId(post);
+        comment.setUser(user);
+        comment.setPost(post);
 
         assertThat(commentService.insert(comment).getCode()).isEqualTo(304);
     }
@@ -102,11 +101,11 @@ public class CommentServiceUnitTest {
     @Test
     void whenInsert_ifUserDoesNotExist_thenReturnsError(){
         Comment comment = new Comment();
-        comment.setUserId(user);
-        comment.setPostId(post);
+        comment.setUser(user);
+        comment.setPost(post);
         comment.setContent("And this is my first mini-tomathought, aka comment! ;)");
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(userRepository.findById(anyString())).thenReturn(Optional.empty());
 
         assertThat(commentService.insert(comment).getCode()).isEqualTo(102);
     }
@@ -114,11 +113,11 @@ public class CommentServiceUnitTest {
     @Test
     void whenInsert_ifPostDoesNotExist_thenReturnsError(){
         Comment comment = new Comment();
-        comment.setUserId(user);
-        comment.setPostId(post);
+        comment.setUser(user);
+        comment.setPost(post);
         comment.setContent("And this is my first mini-tomathought, aka comment! ;)");
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
         when(postRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThat(commentService.insert(comment).getCode()).isEqualTo(201);
@@ -168,7 +167,7 @@ public class CommentServiceUnitTest {
     void unlikeComment(){
         Comment comment = new Comment();
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
         when(commentRepository.findLike(anyLong(), any())).thenReturn(List.of(comment));
 
         assertThat(commentService.unlike(comment.getId(), user.getId()).getCode()).isEqualTo(0);

@@ -59,7 +59,7 @@ public class PostController {
 
     @PutMapping("/{id}/like")
     public ResponseEntity like(@PathVariable("id") long postId, @RequestBody User user){
-        long userId = user.getId();
+        String userId = user.getId();
 
         Response response = postService.like(postId, userId);
 
@@ -76,7 +76,7 @@ public class PostController {
 
     @PutMapping("/{id}/unlike")
     public ResponseEntity unlike(@PathVariable("id") long postId, @RequestBody User user){
-        long userId = user.getId();
+        String userId = user.getId();
 
         Response response = postService.unlike(postId, userId);
 
@@ -102,6 +102,16 @@ public class PostController {
         else{
             return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/content/{id}")
+    public ResponseEntity listContent(@PathVariable("id") Long id){
+        return new ResponseEntity(postService.listContent(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/content/{id}/comments")
+    public ResponseEntity listContentComment(@PathVariable("id") Long id){
+        return new ResponseEntity(postService.listContentComment(id), HttpStatus.OK);
     }
 
 }

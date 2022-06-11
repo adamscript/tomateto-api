@@ -47,7 +47,7 @@ public class CommentController {
 
     @PutMapping("/{id}/like")
     public ResponseEntity like(@PathVariable("id") long commentId, @RequestBody User user){
-        long userId = user.getId();
+        String userId = user.getId();
 
         Response response = commentService.like(commentId, userId);
 
@@ -64,7 +64,7 @@ public class CommentController {
 
     @PutMapping("/{id}/unlike")
     public ResponseEntity unlike(@PathVariable("id") long commentId, @RequestBody User user){
-        long userId = user.getId();
+        String userId = user.getId();
 
         Response response = commentService.unlike(commentId, userId);
 

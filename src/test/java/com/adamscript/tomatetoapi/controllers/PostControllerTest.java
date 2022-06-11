@@ -15,8 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -40,7 +39,7 @@ public class PostControllerTest {
     @BeforeEach
     void initPostController(){
         user = new User();
-        user.setId(1);
+        user.setId("1");
         user.setUsername("eyesocketdisc");
         user.setDisplayName("EyeSocketDisc");
     }
@@ -48,7 +47,7 @@ public class PostControllerTest {
     @Test
     void getPostInformation() throws Exception {
         Post post = new Post();
-        post.setUserId(user);
+        post.setUser(user);
         post.setContent("Hi tomates! This is my first tomathought");
 
         Response response = new Response(post, ServiceStatus.SUCCESS);
@@ -92,7 +91,7 @@ public class PostControllerTest {
     @Test
     void insertNewPost() throws Exception {
         Post post = new Post();
-        post.setUserId(user);
+        post.setUser(user);
         post.setContent("Hi tomates! This is my first tomathought");
 
         Response response = new Response(post, ServiceStatus.SUCCESS);
@@ -125,7 +124,7 @@ public class PostControllerTest {
     @Test
     void editPost() throws Exception {
         Post post = new Post();
-        post.setUserId(user);
+        post.setUser(user);
         post.setContent("Hi tomates! This is my first tomathought");
 
         Response response = new Response(post, ServiceStatus.SUCCESS);
@@ -161,7 +160,7 @@ public class PostControllerTest {
 
         Response response = new Response(null, ServiceStatus.SUCCESS);
 
-        when(postService.like(anyLong(), anyLong())).thenReturn(response);
+        when(postService.like(anyLong(), anyString())).thenReturn(response);
 
         mockMvc.perform(put("/api/post/{id}/like", post.getId())
                         .contentType("application/json")
@@ -176,7 +175,7 @@ public class PostControllerTest {
 
         Response response = new Response(null, ServiceStatus.POST_NOT_FOUND);
 
-        when(postService.like(anyLong(), anyLong())).thenReturn(response);
+        when(postService.like(anyLong(), anyString())).thenReturn(response);
 
         mockMvc.perform(put("/api/post/{id}/like", post.getId())
                         .contentType("application/json")
@@ -191,7 +190,7 @@ public class PostControllerTest {
 
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(postService.like(anyLong(), anyLong())).thenReturn(response);
+        when(postService.like(anyLong(), anyString())).thenReturn(response);
 
         mockMvc.perform(put("/api/post/{id}/like", post.getId())
                         .contentType("application/json")
@@ -206,7 +205,7 @@ public class PostControllerTest {
 
         Response response = new Response(null, ServiceStatus.SUCCESS);
 
-        when(postService.unlike(anyLong(), anyLong())).thenReturn(response);
+        when(postService.unlike(anyLong(), anyString())).thenReturn(response);
 
         mockMvc.perform(put("/api/post/{id}/unlike", post.getId())
                         .contentType("application/json")
@@ -221,7 +220,7 @@ public class PostControllerTest {
 
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(postService.unlike(anyLong(), anyLong())).thenReturn(response);
+        when(postService.unlike(anyLong(), anyString())).thenReturn(response);
 
         mockMvc.perform(put("/api/post/{id}/unlike", post.getId())
                         .contentType("application/json")

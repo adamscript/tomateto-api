@@ -42,7 +42,7 @@ class UserControllerTest {
 
         Response response = new Response(user, ServiceStatus.SUCCESS);
 
-        when(userService.list(anyLong())).thenReturn(response);
+        when(userService.list(anyString())).thenReturn(response);
 
         MvcResult mvcResult = mockMvc.perform(get("/api/user/{id}", 1)
                                     .contentType("application/json"))
@@ -58,7 +58,7 @@ class UserControllerTest {
     void ifUserNotFound_thenReturns404() throws Exception {
         Response response = new Response(null, ServiceStatus.USER_NOT_FOUND);
 
-        when(userService.list(anyLong())).thenReturn(response);
+        when(userService.list(anyString())).thenReturn(response);
 
         mockMvc.perform(get("/api/user/{id}", 3)
                         .contentType("application/json"))
@@ -70,7 +70,7 @@ class UserControllerTest {
     void whenGetUser_ifFails_thenReturns400() throws Exception {
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(userService.list(anyLong())).thenReturn(response);
+        when(userService.list(anyString())).thenReturn(response);
 
         mockMvc.perform(get("/api/user/{id}", 3)
                         .contentType("application/json"))
@@ -181,7 +181,7 @@ class UserControllerTest {
 
         Response response = new Response(null, ServiceStatus.SUCCESS);
 
-        when(userService.follow(anyLong(), anyLong())).thenReturn(response);
+        when(userService.follow(anyString(), anyString())).thenReturn(response);
 
         mockMvc.perform(put("/api/user/{id}/follow", user2.getId())
                         .contentType("application/json")
@@ -196,7 +196,7 @@ class UserControllerTest {
 
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(userService.follow(anyLong(), anyLong())).thenReturn(response);
+        when(userService.follow(anyString(), anyString())).thenReturn(response);
 
         mockMvc.perform(put("/api/user/{id}/follow", 4L)
                         .contentType("application/json")
@@ -212,7 +212,7 @@ class UserControllerTest {
 
         Response response = new Response(null, ServiceStatus.SUCCESS);
 
-        when(userService.unfollow(anyLong(), anyLong())).thenReturn(response);
+        when(userService.unfollow(anyString(), anyString())).thenReturn(response);
 
         mockMvc.perform(put("/api/user/{id}/unfollow", user2.getId())
                         .contentType("application/json")
@@ -227,7 +227,7 @@ class UserControllerTest {
 
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(userService.unfollow(anyLong(), anyLong())).thenReturn(response);
+        when(userService.unfollow(anyString(), anyString())).thenReturn(response);
 
         mockMvc.perform(put("/api/user/{id}/unfollow", 4L)
                         .contentType("application/json")

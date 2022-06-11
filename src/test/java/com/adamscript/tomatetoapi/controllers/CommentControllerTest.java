@@ -16,8 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -43,21 +42,21 @@ public class CommentControllerTest {
     @BeforeEach
     void initCommentController(){
         user = new User();
-        user.setId(3);
+        user.setId("3");
         user.setUsername("eyesocketdisc");
         user.setDisplayName("EyeSocketDisc");
 
         post = new Post();
         post.setId(4);
-        post.setUserId(user);
+        post.setUser(user);
         post.setContent("Hi tomates! This is my first tomathought");
     }
 
     @Test
     void getCommentInformation() throws Exception {
         Comment comment = new Comment();
-        comment.setUserId(user);
-        comment.setPostId(post);
+        comment.setUser(user);
+        comment.setPost(post);
         comment.setContent("And this is my first mini-tomathought, aka comment! ;)");
 
         Response response = new Response(comment, ServiceStatus.SUCCESS);
@@ -101,8 +100,8 @@ public class CommentControllerTest {
     @Test
     void insertNewComment() throws Exception {
         Comment comment = new Comment();
-        comment.setUserId(user);
-        comment.setPostId(post);
+        comment.setUser(user);
+        comment.setPost(post);
         comment.setContent("And this is my first mini-tomathought, aka comment! ;)");
 
         Response response = new Response(comment, ServiceStatus.SUCCESS);
@@ -138,7 +137,7 @@ public class CommentControllerTest {
 
         Response response = new Response(null, ServiceStatus.SUCCESS);
 
-        when(commentService.like(anyLong(), anyLong())).thenReturn(response);
+        when(commentService.like(anyLong(), anyString())).thenReturn(response);
 
         mockMvc.perform(put("/api/comment/{id}/like", comment.getId())
                         .contentType("application/json")
@@ -153,7 +152,7 @@ public class CommentControllerTest {
 
         Response response = new Response(null, ServiceStatus.COMMENT_NOT_FOUND);
 
-        when(commentService.like(anyLong(), anyLong())).thenReturn(response);
+        when(commentService.like(anyLong(), anyString())).thenReturn(response);
 
         mockMvc.perform(put("/api/comment/{id}/like", comment.getId())
                         .contentType("application/json")
@@ -168,7 +167,7 @@ public class CommentControllerTest {
 
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(commentService.like(anyLong(), anyLong())).thenReturn(response);
+        when(commentService.like(anyLong(), anyString())).thenReturn(response);
 
         mockMvc.perform(put("/api/comment/{id}/like", comment.getId())
                         .contentType("application/json")
@@ -183,7 +182,7 @@ public class CommentControllerTest {
 
         Response response = new Response(null, ServiceStatus.SUCCESS);
 
-        when(commentService.unlike(anyLong(), anyLong())).thenReturn(response);
+        when(commentService.unlike(anyLong(), anyString())).thenReturn(response);
 
         mockMvc.perform(put("/api/comment/{id}/unlike", comment.getId())
                         .contentType("application/json")
@@ -198,7 +197,7 @@ public class CommentControllerTest {
 
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(commentService.unlike(anyLong(), anyLong())).thenReturn(response);
+        when(commentService.unlike(anyLong(), anyString())).thenReturn(response);
 
         mockMvc.perform(put("/api/comment/{id}/unlike", comment.getId())
                         .contentType("application/json")
