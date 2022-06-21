@@ -2,6 +2,10 @@ package com.adamscript.tomatetoapi.services;
 
 import com.adamscript.tomatetoapi.helpers.handler.Response;
 import com.adamscript.tomatetoapi.helpers.service.ServiceStatus;
+import com.adamscript.tomatetoapi.models.dto.FeedCommentDTO;
+import com.adamscript.tomatetoapi.models.dto.FeedPostDTO;
+import com.adamscript.tomatetoapi.models.dto.PostContentDTO;
+import com.adamscript.tomatetoapi.models.entities.Comment;
 import com.adamscript.tomatetoapi.models.entities.Post;
 import com.adamscript.tomatetoapi.models.entities.User;
 import com.adamscript.tomatetoapi.models.repos.CommentRepository;
@@ -11,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.security.Principal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -19,8 +24,9 @@ import java.util.Optional;
 @Transactional
 @RequiredArgsConstructor
 public class PostService {
-    private final PostRepository postRepository;
 
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
     private final UserRepository userRepository;
 
     //fetch post content data
@@ -39,7 +45,9 @@ public class PostService {
     }
 
     //create post
-    public Response insert(Post post){
+    public Response insert(Post post, Principal principal){
+        post.setUser(userRepository.getById(principal.getName()));
+
         if(post.getUser() == null){
             return new Response(null, ServiceStatus.POST_USER_EMPTY);
         }
@@ -65,7 +73,7 @@ public class PostService {
     }
 
     //edit post
-    public Response edit(Post post){
+    public Response edit(Post post, Principal principal){
         Optional<Post> insertedPost = postRepository.findById(post.getId());
 
         if(post.getId() == 0){
@@ -77,9 +85,12 @@ public class PostService {
         else if(insertedPost.isEmpty()){
             return new Response(null, ServiceStatus.POST_DOES_NOT_EXIST);
         }
+        else if(insertedPost.get().getUser() != userRepository.getById(principal.getName()) || userRepository.findById(principal.getName()).isEmpty()){
+            return new Response(null, ServiceStatus.UNAUTHORIZED);
+        }
         else if(insertedPost.isPresent()){
             post.setUser(insertedPost.get().getUser());
-            post.setPicture(insertedPost.get().getPicture());
+            post.setPhoto(insertedPost.get().getPhoto());
             post.setDate(insertedPost.get().getDate());
             post.setLikesCount(insertedPost.get().getLikesCount());
             post.setLikes(insertedPost.get().getLikes());
@@ -95,8 +106,8 @@ public class PostService {
     }
 
     //like a post
-    public Response like(long postId, String userId){
-        Optional<User> user = userRepository.findById(userId);
+    public Response like(long postId, Principal principal){
+        Optional<User> user = userRepository.findById(principal.getName());
         Optional<Post> post = postRepository.findById(postId);
 
         List<Post> likedPost = postRepository.findLike(postId, user);
@@ -111,7 +122,9 @@ public class PostService {
             return new Response(null, ServiceStatus.POST_LIKED_ALREADY);
         }
         else if(likedPost.isEmpty()){
-            postRepository.likePost(postId, userId);
+            postRepository.likePost(postId, principal.getName());
+            setLikeCount(post.get());
+
             return new Response(null, ServiceStatus.SUCCESS);
         }
         else{
@@ -120,8 +133,9 @@ public class PostService {
     }
 
     //unlike a post
-    public Response unlike(long postId, String userId){
-        Optional<User> user = userRepository.findById(userId);
+    public Response unlike(long postId, Principal principal){
+        Optional<User> user = userRepository.findById(principal.getName());
+        Optional<Post> post = postRepository.findById(postId);
 
         List<Post> likedPost = postRepository.findLike(postId, user);
 
@@ -129,7 +143,9 @@ public class PostService {
             return new Response(null, ServiceStatus.POST_NOT_LIKED);
         }
         else if(!likedPost.isEmpty()){
-            postRepository.unlikePost(postId, userId);
+            postRepository.unlikePost(postId, principal.getName());
+            setLikeCount(post.get());
+
             return new Response(null, ServiceStatus.SUCCESS);
         }
         else{
@@ -138,11 +154,14 @@ public class PostService {
     }
 
     //deleting a post
-    public Response delete(long id){
+    public Response delete(long id, Principal principal){
         Optional<Post> post = postRepository.findById(id);
 
         if(post.isEmpty()){
             return new Response(null, ServiceStatus.POST_NOT_FOUND);
+        }
+        else if(post.get().getUser() != userRepository.getById(principal.getName()) || userRepository.findById(principal.getName()).isEmpty()){
+            return new Response(null, ServiceStatus.UNAUTHORIZED);
         }
         else if(post.isPresent()){
             postRepository.deleteById(id);
@@ -153,15 +172,76 @@ public class PostService {
         }
     }
 
-    public Response listContent(long id){
+    public Response listContent(long id, Principal principal){
         Post post = postRepository.findById(id).get();
+        PostContentDTO postContent = postRepository.findContent(post);
 
-        return new Response(postRepository.findContent(post), ServiceStatus.SUCCESS);
+        setPrincipalPropertiesOnPost(postContent, principal);
+
+        return new Response(postContent, ServiceStatus.SUCCESS);
     }
 
-    public Response listContentComment(long id){
+    public Response listContentComment(long id, Principal principal){
         Post post = postRepository.findById(id).get();
+        List<FeedCommentDTO> feedComment = postRepository.findCommentByPost(post);
 
-        return new Response(postRepository.findCommentByPost(post), ServiceStatus.SUCCESS);
+        setPrincipalPropertiesOnComment(feedComment, principal);
+
+        return new Response(feedComment, ServiceStatus.SUCCESS);
     }
+
+    private void setLikeCount(Post post){
+        post.setLikesCount(postRepository.findLikes(post).size());
+        postRepository.save(post);
+    }
+
+    private void setPrincipalPropertiesOnPost(PostContentDTO post, Principal principal){
+        if(principal != null){
+            Optional<User> user = userRepository.findById(principal.getName());
+            List<Post> checkLike = postRepository.findLike(post.getId(), user);
+
+            if(post.getUser().get("id").equals(principal.getName())){
+                post.setMine(true);
+            }
+            else{
+                post.setMine(false);
+            }
+
+            if(!checkLike.isEmpty()){
+                post.setLiked(true);
+            }
+            else{
+                post.setLiked(false);
+            }
+        }
+    }
+
+    private void setPrincipalPropertiesOnComment(List<FeedCommentDTO> feedComment, Principal principal){
+        if(principal != null){
+            Optional<User> user = userRepository.findById(principal.getName());
+
+            //check if post is liked by current user
+            for(int i = 0; i < feedComment.size(); i++){
+                if(feedComment.get(i).getUser().get("id").equals(principal.getName())){
+                    feedComment.get(i).setMine(true);
+                }
+                else{
+                    feedComment.get(i).setMine(false);
+                }
+            }
+
+            //check if post is liked by current user
+            for(int i = 0; i < feedComment.size(); i++){
+                List<Comment> checkLike = commentRepository.findLike(feedComment.get(i).getId(), user);
+
+                if(!checkLike.isEmpty()){
+                    feedComment.get(i).setLiked(true);
+                }
+                else{
+                    feedComment.get(i).setLiked(false);
+                }
+            }
+        }
+    }
+
 }

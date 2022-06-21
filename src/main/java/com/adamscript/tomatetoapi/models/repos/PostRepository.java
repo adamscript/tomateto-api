@@ -3,6 +3,7 @@ package com.adamscript.tomatetoapi.models.repos;
 import com.adamscript.tomatetoapi.models.dto.FeedCommentDTO;
 import com.adamscript.tomatetoapi.models.dto.FeedPostDTO;
 import com.adamscript.tomatetoapi.models.dto.PostContentDTO;
+import com.adamscript.tomatetoapi.models.entities.Comment;
 import com.adamscript.tomatetoapi.models.entities.Post;
 import com.adamscript.tomatetoapi.models.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,7 +26,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("select p from Post p where p.id = ?1 and ?2 member of p.likes")
     List<Post> findLike(Long postId, Optional<User> userLiked);
 
-    @Query("select new com.adamscript.tomatetoapi.models.dto.PostContentDTO(p.id, p.content, p.date, p.likesCount, p.commentsCount, p.user) from Post p where p = ?1")
+    @Query("select p.likes from Post p where p = ?1")
+    List<User> findLikes(Post post);
+
+    @Query("select p.comments from Post p where p = ?1")
+    List<Comment> findComments(Post post);
+
+    @Query("select new com.adamscript.tomatetoapi.models.dto.PostContentDTO(p.id, p.content, p.photo, p.date, p.likesCount, p.commentsCount, p.user, p.isEdited) from Post p where p = ?1")
     PostContentDTO findContent(Post post);
 
     @Query("select new com.adamscript.tomatetoapi.models.dto.FeedCommentDTO(c.id, c.content, c.date, c.likesCount, c.user) from Comment c where c.post = ?1")

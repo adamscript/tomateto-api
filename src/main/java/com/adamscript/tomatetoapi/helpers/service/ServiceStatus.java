@@ -37,8 +37,9 @@ public enum ServiceStatus {
     COMMENT_LIKED_ALREADY(305, "Comment already liked"),
     COMMENT_NOT_LIKED(306, "Comment not liked"),
 
-    //Unknown
-    ERROR(400, "An unknown error occurred");
+    //Error
+    ERROR(400, "An unknown error occurred"),
+    UNAUTHORIZED(401, "You are not authorized for this action");
 
     private final int code;
     private final String message;

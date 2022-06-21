@@ -14,6 +14,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.security.Principal;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -33,6 +35,9 @@ public class PostControllerTest {
 
     @MockBean
     private PostService postService;
+
+    @MockBean
+    private Principal principal;
 
     private User user;
 
@@ -96,7 +101,7 @@ public class PostControllerTest {
 
         Response response = new Response(post, ServiceStatus.SUCCESS);
 
-        when(postService.insert(any(Post.class))).thenReturn(response);
+        when(postService.insert(any(Post.class), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(post("/api/post")
                         .contentType("application/json")
@@ -112,7 +117,7 @@ public class PostControllerTest {
 
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(postService.insert(any(Post.class))).thenReturn(response);
+        when(postService.insert(any(Post.class), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(post("/api/post")
                         .contentType("application/json")
@@ -129,7 +134,7 @@ public class PostControllerTest {
 
         Response response = new Response(post, ServiceStatus.SUCCESS);
 
-        when(postService.edit(any(Post.class))).thenReturn(response);
+        when(postService.edit(any(Post.class), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/post")
                         .contentType("application/json")
@@ -145,7 +150,7 @@ public class PostControllerTest {
 
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(postService.edit(any(Post.class))).thenReturn(response);
+        when(postService.edit(any(Post.class), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/post")
                         .contentType("application/json")
@@ -160,7 +165,7 @@ public class PostControllerTest {
 
         Response response = new Response(null, ServiceStatus.SUCCESS);
 
-        when(postService.like(anyLong(), anyString())).thenReturn(response);
+        when(postService.like(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/post/{id}/like", post.getId())
                         .contentType("application/json")
@@ -175,7 +180,7 @@ public class PostControllerTest {
 
         Response response = new Response(null, ServiceStatus.POST_NOT_FOUND);
 
-        when(postService.like(anyLong(), anyString())).thenReturn(response);
+        when(postService.like(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/post/{id}/like", post.getId())
                         .contentType("application/json")
@@ -190,7 +195,7 @@ public class PostControllerTest {
 
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(postService.like(anyLong(), anyString())).thenReturn(response);
+        when(postService.like(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/post/{id}/like", post.getId())
                         .contentType("application/json")
@@ -205,7 +210,7 @@ public class PostControllerTest {
 
         Response response = new Response(null, ServiceStatus.SUCCESS);
 
-        when(postService.unlike(anyLong(), anyString())).thenReturn(response);
+        when(postService.unlike(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/post/{id}/unlike", post.getId())
                         .contentType("application/json")
@@ -220,7 +225,7 @@ public class PostControllerTest {
 
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(postService.unlike(anyLong(), anyString())).thenReturn(response);
+        when(postService.unlike(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/post/{id}/unlike", post.getId())
                         .contentType("application/json")
@@ -233,7 +238,7 @@ public class PostControllerTest {
     void deletePost() throws Exception {
         Response response = new Response(null, ServiceStatus.SUCCESS);
 
-        when(postService.delete(anyLong())).thenReturn(response);
+        when(postService.delete(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(delete("/api/post/{id}/delete", 1)
                         .contentType("application/json"))
@@ -245,7 +250,7 @@ public class PostControllerTest {
     void whenDelete_ifPostNotFound_thenReturns404() throws Exception {
         Response response = new Response(null, ServiceStatus.POST_NOT_FOUND);
 
-        when(postService.delete(anyLong())).thenReturn(response);
+        when(postService.delete(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(delete("/api/post/{id}/delete", 1)
                         .contentType("application/json"))
@@ -257,7 +262,7 @@ public class PostControllerTest {
     void whenDelete_ifFails_thenReturns400() throws Exception {
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(postService.delete(anyLong())).thenReturn(response);
+        when(postService.delete(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(delete("/api/post/{id}/delete", 1)
                         .contentType("application/json"))

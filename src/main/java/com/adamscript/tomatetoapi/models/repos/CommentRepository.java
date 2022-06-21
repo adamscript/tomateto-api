@@ -25,4 +25,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("select c from Comment c where c.id = ?1 and ?2 member of c.likes")
     List<Comment> findLike(Long commentId, Optional<User> userLiked);
 
+    @Query("select c.likes from Comment c where c = ?1")
+    List<User> findLikes(Comment comment);
 }

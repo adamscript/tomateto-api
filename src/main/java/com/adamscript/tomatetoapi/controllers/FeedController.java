@@ -16,23 +16,28 @@ public class FeedController {
     private FeedService feedService;
 
     @GetMapping
-    public ResponseEntity listFeedPost(){
-        return new ResponseEntity(feedService.listFeedPost(), HttpStatus.OK);
+    public ResponseEntity listFeedPost(Principal principal){
+        return new ResponseEntity(feedService.listFeedPost(principal), HttpStatus.OK);
     }
 
     @GetMapping("/following")
     public ResponseEntity listFeedPostByFollow(Principal principal){
-        return new ResponseEntity(feedService.listFeedPostByFollow("1l", principal), HttpStatus.OK);
+        return new ResponseEntity(feedService.listFeedPostByFollow(principal), HttpStatus.OK);
     }
 
     @GetMapping("/top")
-    public ResponseEntity listFeedPostTop(){
-        return new ResponseEntity(feedService.listFeedPostSortTop(), HttpStatus.OK);
+    public ResponseEntity listFeedPostTop(Principal principal){
+        return new ResponseEntity(feedService.listFeedPostSortTop(principal), HttpStatus.OK);
     }
 
     @GetMapping("/latest")
-    public ResponseEntity listFeedPostLatest(){
-        return new ResponseEntity(feedService.listFeedPostSortLatest(), HttpStatus.OK);
+    public ResponseEntity listFeedPostLatest(Principal principal){
+        return new ResponseEntity(feedService.listFeedPostSortLatest(principal), HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity listByKeyword(@RequestParam String q, Principal principal){
+        return new ResponseEntity(feedService.listByKeyword(q, principal), HttpStatus.OK);
     }
 
 }

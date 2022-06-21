@@ -11,22 +11,26 @@ public class PostContentDTO {
 
     private long id;
     private String content;
+    private String photo;
     private Instant date;
     private long likesCount;
     private long commentsCount;
 
     private User user;
 
+    private Boolean isEdited;
     private Boolean isLiked;
     private Boolean isMine;
 
-    public PostContentDTO(long id, String content, Instant date, long likesCount, long commentsCount, User user){
+    public PostContentDTO(long id, String content, String photo, Instant date, long likesCount, long commentsCount, User user, Boolean isEdited){
         this.id = id;
         this.content = content;
+        this.photo = photo;
         this.date = date;
         this.likesCount = likesCount;
         this.commentsCount = commentsCount;
         this.user = user;
+        this.isEdited = isEdited;
         this.isLiked = false;
         this.isMine = false;
     }

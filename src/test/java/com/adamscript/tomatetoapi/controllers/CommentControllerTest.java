@@ -15,6 +15,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.security.Principal;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -35,6 +37,9 @@ public class CommentControllerTest {
 
     @MockBean
     private CommentService commentService;
+
+    @MockBean
+    private Principal principal;
 
     private User user;
     private Post post;
@@ -106,7 +111,7 @@ public class CommentControllerTest {
 
         Response response = new Response(comment, ServiceStatus.SUCCESS);
 
-        when(commentService.insert(any(Comment.class))).thenReturn(response);
+        when(commentService.insert(any(Comment.class), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(post("/api/comment")
                         .contentType("application/json")
@@ -122,7 +127,7 @@ public class CommentControllerTest {
 
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(commentService.insert(any(Comment.class))).thenReturn(response);
+        when(commentService.insert(any(Comment.class), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(post("/api/comment")
                         .contentType("application/json")
@@ -137,7 +142,7 @@ public class CommentControllerTest {
 
         Response response = new Response(null, ServiceStatus.SUCCESS);
 
-        when(commentService.like(anyLong(), anyString())).thenReturn(response);
+        when(commentService.like(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/comment/{id}/like", comment.getId())
                         .contentType("application/json")
@@ -152,7 +157,7 @@ public class CommentControllerTest {
 
         Response response = new Response(null, ServiceStatus.COMMENT_NOT_FOUND);
 
-        when(commentService.like(anyLong(), anyString())).thenReturn(response);
+        when(commentService.like(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/comment/{id}/like", comment.getId())
                         .contentType("application/json")
@@ -167,7 +172,7 @@ public class CommentControllerTest {
 
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(commentService.like(anyLong(), anyString())).thenReturn(response);
+        when(commentService.like(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/comment/{id}/like", comment.getId())
                         .contentType("application/json")
@@ -182,7 +187,7 @@ public class CommentControllerTest {
 
         Response response = new Response(null, ServiceStatus.SUCCESS);
 
-        when(commentService.unlike(anyLong(), anyString())).thenReturn(response);
+        when(commentService.unlike(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/comment/{id}/unlike", comment.getId())
                         .contentType("application/json")
@@ -197,7 +202,7 @@ public class CommentControllerTest {
 
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(commentService.unlike(anyLong(), anyString())).thenReturn(response);
+        when(commentService.unlike(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/comment/{id}/unlike", comment.getId())
                         .contentType("application/json")
@@ -210,7 +215,7 @@ public class CommentControllerTest {
     void deleteComment() throws Exception {
         Response response = new Response(null, ServiceStatus.SUCCESS);
 
-        when(commentService.delete(anyLong())).thenReturn(response);
+        when(commentService.delete(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(delete("/api/comment/{id}/delete", 1)
                         .contentType("application/json"))
@@ -222,7 +227,7 @@ public class CommentControllerTest {
     void whenDelete_ifCommentNotFound_thenReturns404() throws Exception {
         Response response = new Response(null, ServiceStatus.COMMENT_NOT_FOUND);
 
-        when(commentService.delete(anyLong())).thenReturn(response);
+        when(commentService.delete(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(delete("/api/comment/{id}/delete", 1)
                         .contentType("application/json"))
@@ -234,7 +239,7 @@ public class CommentControllerTest {
     void whenDelete_ifFails_thenReturns400() throws Exception {
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(commentService.delete(anyLong())).thenReturn(response);
+        when(commentService.delete(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(delete("/api/comment/{id}/delete", 1)
                         .contentType("application/json"))

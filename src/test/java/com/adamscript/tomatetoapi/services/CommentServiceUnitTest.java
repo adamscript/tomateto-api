@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +24,8 @@ public class CommentServiceUnitTest {
     private PostRepository postRepository = Mockito.mock(PostRepository.class);
     private UserRepository userRepository = Mockito.mock(UserRepository.class);
 
+    private Principal principal = Mockito.mock(Principal.class);
+
     private CommentService commentService;
 
     private User user;
@@ -33,6 +36,7 @@ public class CommentServiceUnitTest {
         commentService = new CommentService(commentRepository, postRepository, userRepository);
 
         user = new User();
+        user.setId("1");
         user.setUsername("eyesocketdisc");
         user.setDisplayName("EyeSocketDisc");
 
@@ -63,74 +67,76 @@ public class CommentServiceUnitTest {
     @Test
     void insertNewComment(){
         Comment comment = new Comment();
-        comment.setUser(user);
         comment.setPost(post);
         comment.setContent("And this is my first mini-tomathought, aka comment! ;)");
 
+        when(userRepository.getById(anyString())).thenReturn(user);
         when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
         when(commentRepository.save(comment)).thenReturn(comment);
 
-        assertThat(commentService.insert(comment).getCode()).isEqualTo(0);
+        assertThat(commentService.insert(comment, principal).getCode()).isEqualTo(0);
     }
 
     @Test
     void whenInsert_ifUserNull_thenReturnsError(){
         Comment comment = new Comment();
 
-        assertThat(commentService.insert(comment).getCode()).isEqualTo(302);
+        assertThat(commentService.insert(comment, principal).getCode()).isEqualTo(302);
     }
 
     @Test
     void whenInsert_ifPostNull_thenReturnsError(){
         Comment comment = new Comment();
-        comment.setUser(user);
 
-        assertThat(commentService.insert(comment).getCode()).isEqualTo(303);
+        when(userRepository.getById(anyString())).thenReturn(user);
+
+        assertThat(commentService.insert(comment, principal).getCode()).isEqualTo(303);
     }
 
     @Test
     void whenInsert_ifContentNull_thenReturnsError(){
         Comment comment = new Comment();
-        comment.setUser(user);
         comment.setPost(post);
 
-        assertThat(commentService.insert(comment).getCode()).isEqualTo(304);
+        when(userRepository.getById(anyString())).thenReturn(user);
+
+        assertThat(commentService.insert(comment, principal).getCode()).isEqualTo(304);
     }
 
     @Test
     void whenInsert_ifUserDoesNotExist_thenReturnsError(){
         Comment comment = new Comment();
-        comment.setUser(user);
         comment.setPost(post);
         comment.setContent("And this is my first mini-tomathought, aka comment! ;)");
 
+        when(userRepository.getById(anyString())).thenReturn(null);
         when(userRepository.findById(anyString())).thenReturn(Optional.empty());
 
-        assertThat(commentService.insert(comment).getCode()).isEqualTo(102);
+        assertThat(commentService.insert(comment, principal).getCode()).isEqualTo(102);
     }
 
     @Test
     void whenInsert_ifPostDoesNotExist_thenReturnsError(){
         Comment comment = new Comment();
-        comment.setUser(user);
         comment.setPost(post);
         comment.setContent("And this is my first mini-tomathought, aka comment! ;)");
 
+        when(userRepository.getById(anyString())).thenReturn(user);
         when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
         when(postRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThat(commentService.insert(comment).getCode()).isEqualTo(201);
+        assertThat(commentService.insert(comment, principal).getCode()).isEqualTo(201);
     }
 
     @Test
     void likeComment(){
         Comment comment = new Comment();
 
-        when(commentRepository.findById(comment.getId())).thenReturn(Optional.of(comment));
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(commentRepository.findById(anyLong())).thenReturn(Optional.of(comment));
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
 
-        assertThat(commentService.like(comment.getId(), user.getId()).getCode()).isEqualTo(0);
+        assertThat(commentService.like(comment.getId(), principal).getCode()).isEqualTo(0);
     }
 
     @Test
@@ -138,10 +144,10 @@ public class CommentServiceUnitTest {
         Comment comment = new Comment();
 
         when(commentRepository.findById(comment.getId())).thenReturn(Optional.of(comment));
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
         when(commentRepository.findLike(comment.getId(), Optional.of(user))).thenReturn(List.of(comment));
 
-        assertThat(commentService.like(comment.getId(), user.getId()).getCode()).isEqualTo(305);
+        assertThat(commentService.like(comment.getId(), principal).getCode()).isEqualTo(305);
     }
 
     @Test
@@ -150,7 +156,7 @@ public class CommentServiceUnitTest {
 
         when(commentRepository.findById(comment.getId())).thenReturn(Optional.empty());
 
-        assertThat(commentService.like(comment.getId(), user.getId()).getCode()).isEqualTo(301);
+        assertThat(commentService.like(comment.getId(), principal).getCode()).isEqualTo(301);
     }
 
     @Test
@@ -158,9 +164,9 @@ public class CommentServiceUnitTest {
         Comment comment = new Comment();
 
         when(commentRepository.findById(comment.getId())).thenReturn(Optional.of(comment));
-        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+        when(userRepository.findById(anyString())).thenReturn(Optional.empty());
 
-        assertThat(commentService.like(comment.getId(), user.getId()).getCode()).isEqualTo(102);
+        assertThat(commentService.like(comment.getId(), principal).getCode()).isEqualTo(102);
     }
 
     @Test
@@ -170,7 +176,7 @@ public class CommentServiceUnitTest {
         when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
         when(commentRepository.findLike(anyLong(), any())).thenReturn(List.of(comment));
 
-        assertThat(commentService.unlike(comment.getId(), user.getId()).getCode()).isEqualTo(0);
+        assertThat(commentService.unlike(comment.getId(), principal).getCode()).isEqualTo(0);
     }
 
     @Test
@@ -178,23 +184,25 @@ public class CommentServiceUnitTest {
         Comment comment = new Comment();
         when(commentRepository.findLike(anyLong(), any())).thenReturn(List.of());
 
-        assertThat(commentService.unlike(comment.getId(), user.getId()).getCode()).isEqualTo(306);
+        assertThat(commentService.unlike(comment.getId(), principal).getCode()).isEqualTo(306);
     }
 
     @Test
     void deleteComment(){
         Comment comment = new Comment();
+        comment.setUser(user);
 
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
         when(commentRepository.findById(anyLong())).thenReturn(Optional.of(comment));
 
-        assertThat(commentService.delete(anyLong()).getCode()).isEqualTo(0);
+        assertThat(commentService.delete(anyLong(), principal).getCode()).isEqualTo(0);
     }
 
     @Test
     void whenDelete_ifCommentNotFound_thenReturnsError(){
         when(commentRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThat(commentService.delete(anyLong()).getCode()).isEqualTo(300);
+        assertThat(commentService.delete(anyLong(), principal).getCode()).isEqualTo(300);
     }
 }
 

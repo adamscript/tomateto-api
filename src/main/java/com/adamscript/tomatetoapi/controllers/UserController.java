@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
@@ -35,8 +37,8 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity insert(@RequestBody User user){
-        Response response = userService.insert(user);
+    public ResponseEntity insert(@RequestBody User user, Principal principal){
+        Response response = userService.insert(user, principal);
 
         if(response.getCode() == 0){
             return new ResponseEntity(response, HttpStatus.OK);
@@ -50,8 +52,8 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity edit(@RequestBody User user){
-        Response response = userService.edit(user);
+    public ResponseEntity edit(@RequestBody User user, Principal principal){
+        Response response = userService.edit(user, principal);
 
         if(response.getCode() == 0){
             return new ResponseEntity(response, HttpStatus.OK);
@@ -65,10 +67,8 @@ public class UserController {
     }
 
     @PutMapping("/{id}/follow")
-    public ResponseEntity follow(@RequestBody User userFollowing, @PathVariable("id") String userFollowedId){
-        String userFollowingId = userFollowing.getId();
-
-        Response response = userService.follow(userFollowingId, userFollowedId);
+    public ResponseEntity follow(@PathVariable("id") String userFollowedId, Principal principal){
+        Response response = userService.follow(userFollowedId, principal);
 
         if(response.getCode() == 0){
             return new ResponseEntity(response, HttpStatus.OK);
@@ -80,10 +80,8 @@ public class UserController {
     };
 
     @PutMapping("/{id}/unfollow")
-    public ResponseEntity unfollow(@RequestBody User userFollowing, @PathVariable("id") String userFollowedId){
-        String userFollowingId = userFollowing.getId();
-
-        Response response = userService.unfollow(userFollowingId, userFollowedId);
+    public ResponseEntity unfollow(@PathVariable("id") String userFollowedId, Principal principal){
+        Response response = userService.unfollow(userFollowedId, principal);
 
         if(response.getCode() == 0){
             return new ResponseEntity(response, HttpStatus.OK);
@@ -93,44 +91,49 @@ public class UserController {
         }
     }
 
-    @GetMapping("/follows")
-    public ResponseEntity listFollows(){
-        return new ResponseEntity(userService.listFollows(), HttpStatus.OK);
+    @GetMapping("/{id}/follows")
+    public ResponseEntity listFollows(@PathVariable("id") String id, Principal principal){
+        return new ResponseEntity(userService.listFollows(id, principal), HttpStatus.OK);
     }
 
-    @GetMapping("/followers")
-    public ResponseEntity listFollowers(){
-        return new ResponseEntity(userService.listFollowers(), HttpStatus.OK);
+    @GetMapping("/{id}/followers")
+    public ResponseEntity listFollowers(@PathVariable("id") String id, Principal principal){
+        return new ResponseEntity(userService.listFollowers(id, principal), HttpStatus.OK);
     }
 
     @GetMapping("/explore")
-    public ResponseEntity listAll(){
-        return new ResponseEntity(userService.listAll(), HttpStatus.OK);
+    public ResponseEntity listAll(Principal principal){
+        return new ResponseEntity(userService.listAll(principal), HttpStatus.OK);
     }
 
     @GetMapping("/nonfollows")
-    public ResponseEntity listNonFollows(){
-        return new ResponseEntity(userService.listNonFollows(), HttpStatus.OK);
+    public ResponseEntity listNonFollows(Principal principal){
+        return new ResponseEntity(userService.listNonFollows(principal), HttpStatus.OK);
     }
 
     @GetMapping("/profile/{username}")
-    public ResponseEntity listProfile(@PathVariable("username") String username){
-        return new ResponseEntity(userService.listProfile(username), HttpStatus.OK);
+    public ResponseEntity listProfile(@PathVariable("username") String username, Principal principal){
+        return new ResponseEntity(userService.listProfile(username, principal), HttpStatus.OK);
     }
 
     @GetMapping("/profile/{id}/posts")
-    public ResponseEntity listProfilePost(@PathVariable("id") String id){
-        return new ResponseEntity(userService.listProfilePost(id), HttpStatus.OK);
+    public ResponseEntity listProfilePost(@PathVariable("id") String id, Principal principal){
+        return new ResponseEntity(userService.listProfilePost(id, principal), HttpStatus.OK);
     }
 
     @GetMapping("/profile/{id}/comments")
-    public ResponseEntity listProfileComment(@PathVariable("id") String id){
-        return new ResponseEntity(userService.listProfileComment(id), HttpStatus.OK);
+    public ResponseEntity listProfileComment(@PathVariable("id") String id, Principal principal){
+        return new ResponseEntity(userService.listProfileComment(id, principal), HttpStatus.OK);
     }
 
     @GetMapping("/profile/{id}/liked")
-    public ResponseEntity listProfileLiked(@PathVariable("id") String id){
-        return new ResponseEntity(userService.listProfileLiked(id), HttpStatus.OK);
+    public ResponseEntity listProfileLiked(@PathVariable("id") String id, Principal principal){
+        return new ResponseEntity(userService.listProfileLiked(id, principal), HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity listByKeyword(@RequestParam String q, Principal principal){
+        return new ResponseEntity(userService.listByKeyword(q, principal), HttpStatus.OK);
     }
 
 }

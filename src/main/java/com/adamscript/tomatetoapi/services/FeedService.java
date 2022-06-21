@@ -30,37 +30,48 @@ public class FeedService {
     @Autowired
     private PostRepository postRepository;
 
-    public Response listFeedPost(){
+    @Autowired
+    private SearchService searchService;
+
+    public Response listFeedPost(Principal principal){
         List<FeedPostDTO> feedPosts = feedRepository.findBy();
+        setPrincipalProperties(feedPosts, principal);
 
         return new Response(feedPosts, ServiceStatus.SUCCESS);
     }
 
-    public Response listFeedPostSortTop(){
+    public Response listFeedPostSortTop(Principal principal){
         List<FeedPostDTO> feedPosts = feedRepository.findAllSort(Sort.by(Sort.Direction.DESC, "likesCount"));
+        setPrincipalProperties(feedPosts, principal);
 
         return new Response(feedPosts, ServiceStatus.SUCCESS);
     }
 
-    public Response listFeedPostSortLatest(){
+    public Response listFeedPostSortLatest(Principal principal){
         List<FeedPostDTO> feedPosts = feedRepository.findAllSort(Sort.by(Sort.Direction.DESC, "date"));
+        setPrincipalProperties(feedPosts, principal);
 
         return new Response(feedPosts, ServiceStatus.SUCCESS);
     }
 
-    public Response listFeedPostByFollow(String userId, Principal principal){
-        System.out.println("Logged in " + principal);
-
-        Optional<User> user = userRepository.findById(userId);
-
+    public Response listFeedPostByFollow(Principal principal){
+        Optional<User> user = userRepository.findById(principal.getName());
         List<FeedPostDTO> feedPosts = feedRepository.findByFollow(user);
 
-        checkLikeOnFeedPost(feedPosts, user);
+        setPrincipalProperties(feedPosts, principal);
 
         return new Response(feedPosts, ServiceStatus.SUCCESS);
     }
 
-    public void checkLikeOnFeedPost(List<FeedPostDTO> feedPosts, Optional<User> user){
+    public Response listByKeyword(String query, Principal principal){
+        List<FeedPostDTO> feedPosts = searchService.getPostByKeyword(query);
+
+        setPrincipalProperties(feedPosts, principal);
+
+        return new Response(feedPosts, ServiceStatus.SUCCESS);
+    }
+
+    private void checkLikeOnFeedPost(List<FeedPostDTO> feedPosts, Optional<User> user){
         //check if post is liked by current user
         for(int i = 0; i < feedPosts.size(); i++){
             List<Post> checkLike = postRepository.findLike(feedPosts.get(i).getId(), user);
@@ -71,6 +82,26 @@ public class FeedService {
             else{
                 feedPosts.get(i).setLiked(false);
             }
+        }
+    }
+
+    private void checkMineOnFeedPost(List<FeedPostDTO> feedPosts, Optional<User> user){
+        //check if post is liked by current user
+        for(int i = 0; i < feedPosts.size(); i++){
+            if(feedPosts.get(i).getUser().get("id").equals(user.get().getId())){
+                feedPosts.get(i).setMine(true);
+            }
+            else{
+                feedPosts.get(i).setMine(false);
+            }
+        }
+    }
+
+    private void setPrincipalProperties(List<FeedPostDTO> feedPosts, Principal principal){
+        if(principal != null){
+            Optional<User> user = userRepository.findById(principal.getName());
+            checkLikeOnFeedPost(feedPosts, user);
+            checkMineOnFeedPost(feedPosts, user);
         }
     }
 
