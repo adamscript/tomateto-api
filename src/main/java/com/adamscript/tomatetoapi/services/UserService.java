@@ -11,6 +11,7 @@ import com.adamscript.tomatetoapi.models.repos.PostRepository;
 import com.adamscript.tomatetoapi.models.repos.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -231,7 +232,7 @@ public class UserService {
 
     public Response listProfilePost(String id, Principal principal){
         User user = userRepository.findById(id).get();
-        List<FeedPostDTO> feedPosts = userRepository.findPostByUser(user);
+        List<FeedPostDTO> feedPosts = userRepository.findPostByUser(user, Sort.by(Sort.Direction.DESC, "date"));
         setPrincipalPropertiesOnFeedPost(feedPosts, principal);
 
         return new Response(feedPosts, ServiceStatus.SUCCESS);
@@ -239,7 +240,7 @@ public class UserService {
 
     public Response listProfileComment(String id, Principal principal){
         User user = userRepository.findById(id).get();
-        List<FeedCommentDTO> feedComments = userRepository.findCommentByUser(user);
+        List<FeedCommentDTO> feedComments = userRepository.findCommentByUser(user, Sort.by(Sort.Direction.DESC, "date"));
         setPrincipalPropertiesOnFeedComment(feedComments, principal);
 
         return new Response(feedComments, ServiceStatus.SUCCESS);
@@ -247,7 +248,7 @@ public class UserService {
 
     public Response listProfileLiked(String id, Principal principal){
         User user = userRepository.findById(id).get();
-        List<FeedPostDTO> feedPosts = userRepository.findLikedByUser(user);
+        List<FeedPostDTO> feedPosts = userRepository.findLikedByUser(user, Sort.by(Sort.Direction.DESC, "date"));
         setPrincipalPropertiesOnFeedPost(feedPosts, principal);
 
         return new Response(feedPosts, ServiceStatus.SUCCESS);

@@ -118,4 +118,9 @@ public class PostController {
         return new ResponseEntity(postService.listContentComment(id, principal), HttpStatus.OK);
     }
 
+    @GetMapping("/content/{id}/likes")
+    public ResponseEntity listContentLikes(@PathVariable("id") Long id, Principal principal){
+        return new ResponseEntity(postService.listContentLikes(id, principal), HttpStatus.OK);
+    }
+
 }

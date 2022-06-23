@@ -4,7 +4,9 @@ import com.adamscript.tomatetoapi.models.dto.FeedCommentDTO;
 import com.adamscript.tomatetoapi.models.dto.FeedPostDTO;
 import com.adamscript.tomatetoapi.models.dto.FeedUserDTO;
 import com.adamscript.tomatetoapi.models.dto.UserDetailDTO;
+import com.adamscript.tomatetoapi.models.entities.Post;
 import com.adamscript.tomatetoapi.models.entities.User;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -43,11 +45,11 @@ public interface UserRepository extends JpaRepository<User, String> {
     List<FeedUserDTO> findNonFollows(Optional<User> user);
 
     @Query("select new com.adamscript.tomatetoapi.models.dto.FeedPostDTO(p.id, p.content, p.photo, p.date, p.likesCount, p.commentsCount, p.user, p.isEdited) from Post p where p.user = ?1")
-    List<FeedPostDTO> findPostByUser(User user);
+    List<FeedPostDTO> findPostByUser(User user, Sort sort);
 
-    @Query("select new com.adamscript.tomatetoapi.models.dto.FeedPostDTO(p.id, p.content, p.photo, p.date, p.likesCount, p.commentsCount, p.user, p.isEdited) from Post p where p.user = ?1 and ?1 member of p.likes")
-    List<FeedPostDTO> findLikedByUser(User user);
+    @Query("select new com.adamscript.tomatetoapi.models.dto.FeedPostDTO(p.id, p.content, p.photo, p.date, p.likesCount, p.commentsCount, p.user, p.isEdited) from Post p where ?1 member of p.likes")
+    List<FeedPostDTO> findLikedByUser(User user, Sort sort);
 
     @Query("select new com.adamscript.tomatetoapi.models.dto.FeedCommentDTO(c.id, c.content, c.date, c.likesCount, c.user) from Comment c where c.user = ?1")
-    List<FeedCommentDTO> findCommentByUser(User user);
+    List<FeedCommentDTO> findCommentByUser(User user, Sort sort);
 }

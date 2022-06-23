@@ -2,6 +2,7 @@ package com.adamscript.tomatetoapi.models.repos;
 
 import com.adamscript.tomatetoapi.models.dto.FeedCommentDTO;
 import com.adamscript.tomatetoapi.models.dto.FeedPostDTO;
+import com.adamscript.tomatetoapi.models.dto.FeedUserDTO;
 import com.adamscript.tomatetoapi.models.dto.PostContentDTO;
 import com.adamscript.tomatetoapi.models.entities.Comment;
 import com.adamscript.tomatetoapi.models.entities.Post;
@@ -37,5 +38,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("select new com.adamscript.tomatetoapi.models.dto.FeedCommentDTO(c.id, c.content, c.date, c.likesCount, c.user) from Comment c where c.post = ?1")
     List<FeedCommentDTO> findCommentByPost(Post post);
+
+    @Query("select new com.adamscript.tomatetoapi.models.dto.FeedUserDTO(u.id, u.displayName, u.username, u.bio, u.avatar) from User u where ?1 member of u.likedPosts")
+    List<FeedUserDTO> findLikesByPost(Post post);
 
 }

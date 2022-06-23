@@ -56,7 +56,7 @@ public class FeedService {
 
     public Response listFeedPostByFollow(Principal principal){
         Optional<User> user = userRepository.findById(principal.getName());
-        List<FeedPostDTO> feedPosts = feedRepository.findByFollow(user);
+        List<FeedPostDTO> feedPosts = feedRepository.findByFollow(user, Sort.by(Sort.Direction.DESC, "date"));
 
         setPrincipalProperties(feedPosts, principal);
 
@@ -86,7 +86,6 @@ public class FeedService {
     }
 
     private void checkMineOnFeedPost(List<FeedPostDTO> feedPosts, Optional<User> user){
-        //check if post is liked by current user
         for(int i = 0; i < feedPosts.size(); i++){
             if(feedPosts.get(i).getUser().get("id").equals(user.get().getId())){
                 feedPosts.get(i).setMine(true);

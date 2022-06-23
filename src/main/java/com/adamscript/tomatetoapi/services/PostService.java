@@ -4,6 +4,7 @@ import com.adamscript.tomatetoapi.helpers.handler.Response;
 import com.adamscript.tomatetoapi.helpers.service.ServiceStatus;
 import com.adamscript.tomatetoapi.models.dto.FeedCommentDTO;
 import com.adamscript.tomatetoapi.models.dto.FeedPostDTO;
+import com.adamscript.tomatetoapi.models.dto.FeedUserDTO;
 import com.adamscript.tomatetoapi.models.dto.PostContentDTO;
 import com.adamscript.tomatetoapi.models.entities.Comment;
 import com.adamscript.tomatetoapi.models.entities.Post;
@@ -46,7 +47,7 @@ public class PostService {
 
     //create post
     public Response insert(Post post, Principal principal){
-        post.setUser(userRepository.getById(principal.getName()));
+        post.setUser(userRepository.findById(principal.getName()).get());
 
         if(post.getUser() == null){
             return new Response(null, ServiceStatus.POST_USER_EMPTY);
@@ -190,6 +191,15 @@ public class PostService {
         return new Response(feedComment, ServiceStatus.SUCCESS);
     }
 
+    public Response listContentLikes(long id, Principal principal){
+        Post post = postRepository.findById(id).get();
+        List<FeedUserDTO> feedUser = postRepository.findLikesByPost(post);
+
+        setPrincipalPropertiesOnFeedUser(feedUser, principal);
+
+        return new Response(feedUser, ServiceStatus.SUCCESS);
+    }
+
     private void setLikeCount(Post post){
         post.setLikesCount(postRepository.findLikes(post).size());
         postRepository.save(post);
@@ -239,6 +249,32 @@ public class PostService {
                 }
                 else{
                     feedComment.get(i).setLiked(false);
+                }
+            }
+        }
+    }
+
+    private void setPrincipalPropertiesOnFeedUser(List<FeedUserDTO> feedUser, Principal principal){
+        if(principal != null){
+            //check if post is liked by current user
+            for(int i = 0; i < feedUser.size(); i++){
+                if(feedUser.get(i).getId().equals(principal.getName())){
+                    feedUser.get(i).setMine(true);
+                }
+                else{
+                    feedUser.get(i).setMine(false);
+                }
+            }
+
+            //check if post is liked by current user
+            for(int i = 0; i < feedUser.size(); i++){
+                List<User> checkFollow = userRepository.findFollow(principal.getName(), userRepository.findById(feedUser.get(i).getId()));
+
+                if(!checkFollow.isEmpty()){
+                    feedUser.get(i).setIsFollowed(true);
+                }
+                else{
+                    feedUser.get(i).setIsFollowed(false);
                 }
             }
         }

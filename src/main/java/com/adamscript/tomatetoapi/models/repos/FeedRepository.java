@@ -19,6 +19,6 @@ public interface FeedRepository extends JpaRepository<Post, Long> {
     List<FeedPostDTO> findAllSort(Sort sort);
 
     @Query("select new com.adamscript.tomatetoapi.models.dto.FeedPostDTO(p.id, p.content, p.photo, p.date, p.likesCount, p.commentsCount, p.user, p.isEdited) from Post p where ?1 member of p.user.followers")
-    List<FeedPostDTO> findByFollow(Optional<User> user);
+    List<FeedPostDTO> findByFollow(Optional<User> user, Sort sort);
 
 }
