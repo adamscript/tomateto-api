@@ -42,7 +42,7 @@ public class CommentService {
 
     //create comment
     public Response insert(Comment comment, Principal principal){
-        comment.setUser(userRepository.getById(principal.getName()));
+        comment.setUser(userRepository.findById(principal.getName()).get());
 
         if(comment.getUser() == null){
             return new Response(null, ServiceStatus.COMMENT_USER_EMPTY);

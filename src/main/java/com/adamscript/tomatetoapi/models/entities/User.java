@@ -47,7 +47,10 @@ public class User implements Serializable {
     @Field(store = Store.YES)
     private String bio;
 
-    private String avatar;
+    private String avatarDefault;
+    private String avatarMedium;
+    private String avatarSmall;
+    private String avatarExtrasmall;
 
     private long followCount;
 

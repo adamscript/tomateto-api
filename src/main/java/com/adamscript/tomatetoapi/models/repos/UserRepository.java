@@ -18,7 +18,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     Optional<User> findByUsername(String username);
 
-    @Query("select new com.adamscript.tomatetoapi.models.dto.UserDetailDTO(u.id, u.displayName, u.username, u.bio, u.avatar, u.postsCount, u.followCount, u.followersCount) from User u where u.username = ?1")
+    @Query("select new com.adamscript.tomatetoapi.models.dto.UserDetailDTO(u.id, u.displayName, u.username, u.bio, u.avatarDefault, u.avatarMedium, u.avatarSmall, u.avatarExtrasmall, u.postsCount, u.followCount, u.followersCount) from User u where u.username = ?1")
     Optional<UserDetailDTO> findProfileByUsername(String username);
 
     @Modifying(clearAutomatically = true)
@@ -32,16 +32,16 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query("select u from User u where u.id = ?1 and ?2 member of u.follow")
     List<User> findFollow(String userFollowingId, Optional<User> userFollowed);
 
-    @Query("select new com.adamscript.tomatetoapi.models.dto.FeedUserDTO(u.id, u.displayName, u.username, u.bio, u.avatar) from User u")
+    @Query("select new com.adamscript.tomatetoapi.models.dto.FeedUserDTO(u.id, u.displayName, u.username, u.bio, u.avatarDefault, u.avatarMedium, u.avatarSmall, u.avatarExtrasmall) from User u")
     List<FeedUserDTO> findAllUsers();
 
-    @Query("select new com.adamscript.tomatetoapi.models.dto.FeedUserDTO(u.id, u.displayName, u.username, u.bio, u.avatar) from User u where ?1 member of u.followers")
+    @Query("select new com.adamscript.tomatetoapi.models.dto.FeedUserDTO(u.id, u.displayName, u.username, u.bio, u.avatarDefault, u.avatarMedium, u.avatarSmall, u.avatarExtrasmall) from User u where ?1 member of u.followers")
     List<FeedUserDTO> findFollows(User user);
 
-    @Query("select new com.adamscript.tomatetoapi.models.dto.FeedUserDTO(u.id, u.displayName, u.username, u.bio, u.avatar) from User u where ?1 member of u.follow")
+    @Query("select new com.adamscript.tomatetoapi.models.dto.FeedUserDTO(u.id, u.displayName, u.username, u.bio, u.avatarDefault, u.avatarMedium, u.avatarSmall, u.avatarExtrasmall) from User u where ?1 member of u.follow")
     List<FeedUserDTO> findFollowers(User user);
 
-    @Query("select new com.adamscript.tomatetoapi.models.dto.FeedUserDTO(u.id, u.displayName, u.username, u.bio, u.avatar) from User u where u <> ?1 and ?1 not member of u.followers")
+    @Query("select new com.adamscript.tomatetoapi.models.dto.FeedUserDTO(u.id, u.displayName, u.username, u.bio, u.avatarDefault, u.avatarMedium, u.avatarSmall, u.avatarExtrasmall) from User u where u <> ?1 and ?1 not member of u.followers")
     List<FeedUserDTO> findNonFollows(Optional<User> user);
 
     @Query("select new com.adamscript.tomatetoapi.models.dto.FeedPostDTO(p.id, p.content, p.photo, p.date, p.likesCount, p.commentsCount, p.user, p.isEdited) from Post p where p.user = ?1")
@@ -50,6 +50,6 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query("select new com.adamscript.tomatetoapi.models.dto.FeedPostDTO(p.id, p.content, p.photo, p.date, p.likesCount, p.commentsCount, p.user, p.isEdited) from Post p where ?1 member of p.likes")
     List<FeedPostDTO> findLikedByUser(User user, Sort sort);
 
-    @Query("select new com.adamscript.tomatetoapi.models.dto.FeedCommentDTO(c.id, c.content, c.date, c.likesCount, c.user) from Comment c where c.user = ?1")
+    @Query("select new com.adamscript.tomatetoapi.models.dto.FeedCommentDTO(c.id, c.content, c.date, c.likesCount, c.user, c.post) from Comment c where c.user = ?1")
     List<FeedCommentDTO> findCommentByUser(User user, Sort sort);
 }

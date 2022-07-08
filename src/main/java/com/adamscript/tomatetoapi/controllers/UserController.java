@@ -91,14 +91,14 @@ public class UserController {
         }
     }
 
-    @GetMapping("/{id}/follows")
-    public ResponseEntity listFollows(@PathVariable("id") String id, Principal principal){
-        return new ResponseEntity(userService.listFollows(id, principal), HttpStatus.OK);
+    @GetMapping("/{username}/follows")
+    public ResponseEntity listFollows(@PathVariable("username") String username, Principal principal){
+        return new ResponseEntity(userService.listFollows(username, principal), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}/followers")
-    public ResponseEntity listFollowers(@PathVariable("id") String id, Principal principal){
-        return new ResponseEntity(userService.listFollowers(id, principal), HttpStatus.OK);
+    @GetMapping("/{username}/followers")
+    public ResponseEntity listFollowers(@PathVariable("username") String username, Principal principal){
+        return new ResponseEntity(userService.listFollowers(username, principal), HttpStatus.OK);
     }
 
     @GetMapping("/explore")

@@ -31,7 +31,7 @@ public class Comment implements Serializable{
     @JoinColumn(name = "users", referencedColumnName = "id")
     private User user;
 
-    private Instant date;
+    private Instant date = Instant.now();
 
     @ManyToOne
     @NotNull

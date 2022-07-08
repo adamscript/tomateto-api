@@ -31,3 +31,14 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Lucene ###
+*.fdt
+*.fdx
+*.fnm
+*.nvd
+*.nvm
+*.si
+*_Lucene
+*_Lucene*
+*segments*

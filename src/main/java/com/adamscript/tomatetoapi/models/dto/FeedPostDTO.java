@@ -37,11 +37,17 @@ public class FeedPostDTO {
 
     public HashMap<String, Object> getUser(){
         HashMap<String, Object> feedUser = new HashMap<>();
+        HashMap<String, Object> avatar = new HashMap<>();
+
+        avatar.put("default", user.getAvatarDefault());
+        avatar.put("medium", user.getAvatarMedium());
+        avatar.put("small", user.getAvatarSmall());
+        avatar.put("extraSmall", user.getAvatarExtrasmall());
 
         feedUser.put("id", user.getId());
         feedUser.put("displayName", user.getDisplayName());
         feedUser.put("username", user.getUsername());
-        feedUser.put("avatar", user.getAvatar());
+        feedUser.put("avatar", avatar);
 
         return feedUser;
     }

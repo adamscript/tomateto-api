@@ -49,7 +49,7 @@ public class SearchService {
                 .forEntity(Post.class)
                 .get();
 
-        Query query = qb.keyword()
+        Query query = qb.keyword().fuzzy()
                 .onField("content")
                 .matching(keyword)
                 .createQuery();
@@ -71,7 +71,7 @@ public class SearchService {
                 .forEntity(User.class)
                 .get();
 
-        Query query = qb.keyword()
+        Query query = qb.keyword().fuzzy()
                 .onFields("username", "displayName", "bio")
                 .matching(keyword)
                 .createQuery();
@@ -108,7 +108,10 @@ public class SearchService {
                     (String) objects[1],
                     (String) objects[2],
                     (String) objects[3],
-                    (String) objects[4]);
+                    (String) objects[4],
+                    (String) objects[5],
+                    (String) objects[6],
+                    (String) objects[7]);
             userList.add(feedUserDTO);
         }
         return userList;

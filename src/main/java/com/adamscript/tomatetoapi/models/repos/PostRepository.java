@@ -36,10 +36,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("select new com.adamscript.tomatetoapi.models.dto.PostContentDTO(p.id, p.content, p.photo, p.date, p.likesCount, p.commentsCount, p.user, p.isEdited) from Post p where p = ?1")
     PostContentDTO findContent(Post post);
 
-    @Query("select new com.adamscript.tomatetoapi.models.dto.FeedCommentDTO(c.id, c.content, c.date, c.likesCount, c.user) from Comment c where c.post = ?1")
+    @Query("select new com.adamscript.tomatetoapi.models.dto.FeedCommentDTO(c.id, c.content, c.date, c.likesCount, c.user, c.post) from Comment c where c.post = ?1")
     List<FeedCommentDTO> findCommentByPost(Post post);
 
-    @Query("select new com.adamscript.tomatetoapi.models.dto.FeedUserDTO(u.id, u.displayName, u.username, u.bio, u.avatar) from User u where ?1 member of u.likedPosts")
+    @Query("select new com.adamscript.tomatetoapi.models.dto.FeedUserDTO(u.id, u.displayName, u.username, u.bio, u.avatarDefault, u.avatarMedium, u.avatarSmall, u.avatarExtrasmall) from User u where ?1 member of u.likedPosts")
     List<FeedUserDTO> findLikesByPost(Post post);
 
 }

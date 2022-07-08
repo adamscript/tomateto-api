@@ -164,8 +164,8 @@ public class UserService {
 
     //----------------------------------------------------------------//
 
-    public Response listFollows(String id, Principal principal){
-        Optional<User> user = userRepository.findById(id);
+    public Response listFollows(String username, Principal principal){
+        Optional<User> user = userRepository.findByUsername(username);
 
         if(user.isPresent()){
             List<FeedUserDTO> userFollows = userRepository.findFollows(user.get());
@@ -182,8 +182,8 @@ public class UserService {
 
     }
 
-    public Response listFollowers(String id, Principal principal){
-        Optional<User> user = userRepository.findById(id);
+    public Response listFollowers(String username, Principal principal){
+        Optional<User> user = userRepository.findByUsername(username);
 
         if(user.isPresent()){
             List<FeedUserDTO> userFollowers = userRepository.findFollowers(user.get());
