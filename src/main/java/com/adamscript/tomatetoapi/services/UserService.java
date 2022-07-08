@@ -48,7 +48,7 @@ public class UserService {
 
     //register new user
     public Response insert(User user, Principal principal){
-        Optional<User> insertedUser = userRepository.findByUsername(user.getUsername());
+        Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
 
         if(user.getUsername() == null){
             return new Response(null, ServiceStatus.USERNAME_EMPTY);
@@ -56,10 +56,10 @@ public class UserService {
         else if(user.getDisplayName() == null){
             return new Response(null, ServiceStatus.DISPLAYNAME_EMPTY);
         }
-        else if (insertedUser.isPresent()){
+        else if (existingUser.isPresent()){
             return new Response(null, ServiceStatus.USERNAME_ALREADY_EXIST);
         }
-        else if (insertedUser.isEmpty()) {
+        else if (existingUser.isEmpty()) {
             user.setId(principal.getName());
             User savedUser = userRepository.save(user);
 
@@ -72,6 +72,7 @@ public class UserService {
 
     public Response edit(User user, Principal principal){
         Optional<User> insertedUser = userRepository.findById(principal.getName());
+        Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
 
         if(user.getUsername() == null){
             return new Response(null, ServiceStatus.USERNAME_EMPTY);
@@ -79,10 +80,13 @@ public class UserService {
         else if(user.getDisplayName() == null){
             return new Response(null, ServiceStatus.DISPLAYNAME_EMPTY);
         }
-        else if (insertedUser.isEmpty()){
+        else if(insertedUser.isEmpty()){
             return new Response(null, ServiceStatus.USER_DOES_NOT_EXIST);
         }
-        else if (insertedUser.isPresent()) {
+        else if(existingUser.isPresent() && existingUser.get().getUsername() != insertedUser.get().getUsername()){
+            return new Response(null, ServiceStatus.USERNAME_ALREADY_EXIST);
+        }
+        else if(insertedUser.isPresent()){
             //maintain user info before saving the update
             user.setId(principal.getName());
             user.setDate(insertedUser.get().getDate());
@@ -128,6 +132,7 @@ public class UserService {
         }
         else if(userFollowingId != userFollowedId && userFollowed.isPresent() && userFollowing.isPresent()){
             userRepository.followUser(userFollowingId, userFollowedId);
+            setProfileFollowCount(userFollowing.get(), userFollowed.get());
             return new Response(null, ServiceStatus.SUCCESS);
         }
         else{
@@ -139,6 +144,7 @@ public class UserService {
     public Response unfollow(String userFollowedId, Principal principal) {
         String userFollowingId = principal.getName();
 
+        Optional<User> userFollowing = userRepository.findById(userFollowingId);
         Optional<User> userFollowed = userRepository.findById(userFollowedId);
 
         List<User> userFollow = userRepository.findFollow(userFollowingId, userFollowed);
@@ -148,7 +154,7 @@ public class UserService {
         }
         else if(!userFollow.isEmpty()){
             userRepository.unfollowUser(userFollowingId, userFollowedId);
-            setFollowCount(userRepository.findById(userFollowingId).get());
+            setProfileFollowCount(userFollowing.get(), userFollowed.get());
             return new Response(null, ServiceStatus.SUCCESS);
         }
         else{
@@ -156,10 +162,12 @@ public class UserService {
         }
     }
 
-    private void setFollowCount(User user){
-        user.setFollowCount(userRepository.findFollows(user).size());
-        user.setFollowersCount(userRepository.findFollowers(user).size());
-        userRepository.save(user);
+    private void setProfileFollowCount(User followingUser, User followedUser){
+        followingUser.setFollowCount(userRepository.findFollows(followingUser).size());
+        followedUser.setFollowersCount(userRepository.findFollowers(followedUser).size());
+
+        userRepository.save(followingUser);
+        userRepository.save(followedUser);
     }
 
     //----------------------------------------------------------------//
@@ -225,9 +233,17 @@ public class UserService {
 
     public Response listProfile(String username, Principal principal){
         Optional<UserDetailDTO> user = userRepository.findProfileByUsername(username);
-        setPrincipalPropertiesOnUser(user.get(), principal);
 
-        return new Response(user, ServiceStatus.SUCCESS);
+        if(user.isEmpty()){
+            return new Response(null, ServiceStatus.USER_NOT_FOUND);
+        }
+        else if(user.isPresent()){
+            setPrincipalPropertiesOnUser(user.get(), principal);
+            return new Response(user, ServiceStatus.SUCCESS);
+        }
+        else {
+            return new Response(null, ServiceStatus.ERROR);
+        }
     }
 
     public Response listProfilePost(String id, Principal principal){

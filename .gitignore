@@ -39,6 +39,9 @@ build/
 *.nvd
 *.nvm
 *.si
+*.cfe
+*.cfs
+*.liv
 *_Lucene
 *_Lucene*
 *segments*

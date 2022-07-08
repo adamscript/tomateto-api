@@ -77,8 +77,9 @@ public class SearchService {
                 .createQuery();
 
         FullTextQuery fullTextQuery = fullTextEntityManager.createFullTextQuery(query, User.class);
-        fullTextQuery.setProjection("id", "displayName", "username", "bio", "avatar");
+        fullTextQuery.setProjection("id", "displayName", "username", "bio", "avatarDefault", "avatarMedium", "avatarSmall", "avatarExtrasmall");
 
+        System.out.println(fullTextQuery.getResultList());
         return getUserList(fullTextQuery.getResultList());
 
     }

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 
@@ -47,9 +48,13 @@ public class User implements Serializable {
     @Field(store = Store.YES)
     private String bio;
 
+    @Field(index = Index.NO, store = Store.YES)
     private String avatarDefault;
+    @Field(index = Index.NO, store = Store.YES)
     private String avatarMedium;
+    @Field(index = Index.NO, store = Store.YES)
     private String avatarSmall;
+    @Field(index = Index.NO, store = Store.YES)
     private String avatarExtrasmall;
 
     private long followCount;

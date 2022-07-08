@@ -43,6 +43,7 @@ public class Post implements Serializable {
 
     @NotNull
     @Field(store = Store.YES)
+    @Column(columnDefinition="text")
     private String content;
 
     @Field(index = Index.NO, store = Store.YES)

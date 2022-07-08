@@ -58,6 +58,9 @@ public class UserController {
         if(response.getCode() == 0){
             return new ResponseEntity(response, HttpStatus.OK);
         }
+        else if(response.getCode() == 101){
+            return new ResponseEntity(response, HttpStatus.CONFLICT);
+        }
         else if(response.getCode() == 102){
             return new ResponseEntity(response, HttpStatus.NOT_FOUND);
         }
@@ -113,7 +116,17 @@ public class UserController {
 
     @GetMapping("/profile/{username}")
     public ResponseEntity listProfile(@PathVariable("username") String username, Principal principal){
-        return new ResponseEntity(userService.listProfile(username, principal), HttpStatus.OK);
+        Response response = userService.listProfile(username, principal);
+
+        if(response.getCode() == 0){
+            return new ResponseEntity(response, HttpStatus.OK);
+        }
+        else if(response.getCode() == 100){
+            return new ResponseEntity(response, HttpStatus.NOT_FOUND);
+        }
+        else{
+            return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/profile/{id}/posts")
