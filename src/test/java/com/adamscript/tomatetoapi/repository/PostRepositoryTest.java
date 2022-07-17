@@ -4,6 +4,7 @@ import com.adamscript.tomatetoapi.models.entities.Post;
 import com.adamscript.tomatetoapi.models.entities.User;
 import com.adamscript.tomatetoapi.models.repos.PostRepository;
 import com.adamscript.tomatetoapi.models.repos.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -30,14 +31,21 @@ public class PostRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    @Test
-    void likePost(){
-        Post post = new Post();
+    private User user;
+    private Post post;
+
+    @BeforeEach
+    void initPostRepository(){
+        post = new Post();
         entityManager.persist(post);
 
-        User user = new User();
+        user = new User();
+        user.setId("user");
         entityManager.persist(user);
+    }
 
+    @Test
+    void likePost(){
         postRepository.likePost(post.getId(), user.getId());
 
         Post likedPost = postRepository.findById(post.getId()).get();
@@ -49,12 +57,6 @@ public class PostRepositoryTest {
 
     @Test
     void unlikePost(){
-        Post post = new Post();
-        entityManager.persist(post);
-
-        User user = new User();
-        entityManager.persist(user);
-
         postRepository.likePost(post.getId(), user.getId());
         postRepository.unlikePost(post.getId(), user.getId());
 
@@ -67,12 +69,6 @@ public class PostRepositoryTest {
 
     @Test
     void findLike(){
-        Post post = new Post();
-        entityManager.persist(post);
-
-        User user = new User();
-        entityManager.persist(user);
-
         postRepository.likePost(post.getId(), user.getId());
 
         Optional<Post> likedPost = postRepository.findById(post.getId());

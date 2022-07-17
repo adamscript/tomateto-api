@@ -12,13 +12,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -30,6 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CommentIntegrationTest {
 
     @Autowired
+    private WebApplicationContext context;
+
     private MockMvc mockMvc;
 
     @Autowired
@@ -46,10 +53,17 @@ public class CommentIntegrationTest {
 
     private User user;
     private Post post;
+    private Comment comment;
 
     @BeforeEach
     void initCommentIntegration(){
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .apply(springSecurity())
+                .build();
+
         user = new User();
+        user.setId("1");
         user.setUsername("eyesocketdisc");
         user.setDisplayName("EyeSocketDisc");
 
@@ -57,19 +71,18 @@ public class CommentIntegrationTest {
         post.setUser(user);
         post.setContent("Hi tomates! This is my first tomathought");
 
-        userRepository.saveAndFlush(user);
-        postRepository.saveAndFlush(post);
-    }
-
-    @Test
-    void getCommentInformation() throws Exception{
-        Comment comment = new Comment();
+        comment = new Comment();
         comment.setUser(user);
         comment.setPost(post);
         comment.setContent("And this is my first mini-tomathought, aka comment! ;)");
 
+        userRepository.saveAndFlush(user);
+        postRepository.saveAndFlush(post);
         commentRepository.saveAndFlush(comment);
+    }
 
+    @Test
+    void getCommentInformation() throws Exception{
         mockMvc.perform(get("/api/comment/{id}", comment.getId())
                         .contentType("application/json"))
                 .andDo(print())
@@ -78,13 +91,10 @@ public class CommentIntegrationTest {
     }
 
     @Test
+    @WithMockUser("1")
     void insertNewComment() throws Exception{
-        Comment comment = new Comment();
-        comment.setUser(user);
-        comment.setPost(post);
-        comment.setContent("And this is my first mini-tomathought, aka comment! ;)");
-
         mockMvc.perform(post("/api/comment")
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(comment)))
                 .andDo(print())
@@ -93,14 +103,10 @@ public class CommentIntegrationTest {
     }
 
     @Test
+    @WithMockUser("1")
     void likeComment() throws Exception{
-        Comment comment = new Comment();
-        User user = new User();
-
-        commentRepository.save(comment);
-        userRepository.save(user);
-
         mockMvc.perform(put("/api/comment/{id}/like", comment.getId())
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -113,18 +119,14 @@ public class CommentIntegrationTest {
     }
 
     @Test
+    @WithMockUser("1")
     void unlikeComment() throws Exception{
-        Comment comment = new Comment();
-        User user = new User();
-
-        commentRepository.save(comment);
-        userRepository.save(user);
-
         //like newly created comment first
         commentRepository.likeComment(comment.getId(), user.getId());
 
         //then unlike it
         mockMvc.perform(put("/api/comment/{id}/unlike", comment.getId())
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -135,11 +137,10 @@ public class CommentIntegrationTest {
     }
 
     @Test
+    @WithMockUser("1")
     void deleteComment() throws Exception{
-        Comment comment = new Comment();
-        commentRepository.saveAndFlush(comment);
-
         mockMvc.perform(delete("/api/comment/{id}/delete", comment.getId())
+                        .with(csrf())
                         .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isOk());

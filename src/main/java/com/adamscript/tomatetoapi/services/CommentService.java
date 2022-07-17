@@ -42,19 +42,14 @@ public class CommentService {
 
     //create comment
     public Response insert(Comment comment, Principal principal){
-        comment.setUser(userRepository.findById(principal.getName()).get());
-
-        if(comment.getUser() == null){
-            return new Response(null, ServiceStatus.COMMENT_USER_EMPTY);
-        }
-        else if(comment.getPost() == null){
+        if(comment.getPost() == null){
             return new Response(null, ServiceStatus.COMMENT_POST_EMPTY);
         }
-        else if(comment.getContent() == null){
+        else if(comment.getContent() == null || comment.getContent() == ""){
             return new Response(null, ServiceStatus.COMMENT_CONTENT_EMPTY);
         }
-        else if(comment.getUser() != null && comment.getPost() != null && comment.getContent() != null){
-            Optional<User> user = userRepository.findById(comment.getUser().getId());
+        else if(comment.getPost() != null && comment.getContent() != null){
+            Optional<User> user = userRepository.findById(principal.getName());
             Optional<Post> post = postRepository.findById(comment.getPost().getId());
 
             if(user.isEmpty()){
@@ -64,6 +59,7 @@ public class CommentService {
                 return new Response(null, ServiceStatus.POST_DOES_NOT_EXIST);
             }
             else if(user.isPresent() && post.isPresent()){
+                comment.setUser(user.get());
                 Comment response = commentRepository.save(comment);
                 setCommentCount(post.get());
 
@@ -129,17 +125,18 @@ public class CommentService {
     //deleting a comment
     public Response delete(long id, Principal principal){
         Optional<Comment> comment = commentRepository.findById(id);
-        Optional<Post> post = postRepository.findById(comment.get().getPost().getId());
 
         if(comment.isEmpty()){
             return new Response(null, ServiceStatus.COMMENT_NOT_FOUND);
         }
-        else if(comment.get().getUser() != userRepository.getById(principal.getName()) || userRepository.findById(principal.getName()).isEmpty()){
+        else if(comment.get().getUser().getId() != userRepository.findById(principal.getName()).get().getId() || userRepository.findById(principal.getName()).isEmpty()){
             return new Response(null, ServiceStatus.UNAUTHORIZED);
         }
         else if(comment.isPresent()){
             commentRepository.deleteById(id);
-            setCommentCount(post.get());
+
+            Post post = postRepository.findById(comment.get().getPost().getId()).get();
+            setCommentCount(post);
 
             return new Response(null, ServiceStatus.SUCCESS);
         }

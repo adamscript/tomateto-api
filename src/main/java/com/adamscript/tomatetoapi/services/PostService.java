@@ -47,21 +47,17 @@ public class PostService {
 
     //create post
     public Response insert(Post post, Principal principal){
-        post.setUser(userRepository.findById(principal.getName()).get());
-
-        if(post.getUser() == null){
-            return new Response(null, ServiceStatus.POST_USER_EMPTY);
-        }
-        else if(post.getContent() == null){
+        if(post.getContent() == null || post.getContent() == ""){
             return new Response(null, ServiceStatus.POST_CONTENT_EMPTY);
         }
-        else if(post.getUser() != null && post.getContent() != null){
-            Optional<User> user = userRepository.findById(post.getUser().getId());
+        else if(post.getContent() != null){
+            Optional<User> user = userRepository.findById(principal.getName());
 
             if(user.isEmpty()){
                 return new Response(null, ServiceStatus.USER_DOES_NOT_EXIST);
             }
             else if(user.isPresent()){
+                post.setUser(user.get());
                 return new Response(postRepository.save(post), ServiceStatus.SUCCESS);
             }
             else{
@@ -80,13 +76,13 @@ public class PostService {
         if(post.getId() == 0){
             return new Response(null, ServiceStatus.POST_DOES_NOT_EXIST);
         }
-        else if(post.getContent() == null){
+        else if(post.getContent() == null || post.getContent() == ""){
             return new Response(null, ServiceStatus.POST_CONTENT_EMPTY);
         }
         else if(insertedPost.isEmpty()){
             return new Response(null, ServiceStatus.POST_DOES_NOT_EXIST);
         }
-        else if(insertedPost.get().getUser() != userRepository.getById(principal.getName()) || userRepository.findById(principal.getName()).isEmpty()){
+        else if(insertedPost.get().getUser().getId() != userRepository.findById(principal.getName()).get().getId() || userRepository.findById(principal.getName()).isEmpty()){
             return new Response(null, ServiceStatus.UNAUTHORIZED);
         }
         else if(insertedPost.isPresent()){
@@ -161,7 +157,7 @@ public class PostService {
         if(post.isEmpty()){
             return new Response(null, ServiceStatus.POST_NOT_FOUND);
         }
-        else if(post.get().getUser() != userRepository.getById(principal.getName()) || userRepository.findById(principal.getName()).isEmpty()){
+        else if(post.get().getUser().getId() != userRepository.findById(principal.getName()).get().getId() || userRepository.findById(principal.getName()).isEmpty()){
             return new Response(null, ServiceStatus.UNAUTHORIZED);
         }
         else if(post.isPresent()){

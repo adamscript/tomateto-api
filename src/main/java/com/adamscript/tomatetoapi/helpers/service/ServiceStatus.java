@@ -16,7 +16,7 @@ public enum ServiceStatus {
     DISPLAYNAME_EMPTY(104, "Name can't be empty"),
     FOLLOW_YOURSELF(105, "You can't follow yourself"),
     FOLLOW_DOES_NOT_EXIST(106, "You can't follow non existing user"),
-    FOLLOWER_DOES_NOT_EXIST(107, "You can't follow if you does not exist"),
+    FOLLOWER_DOES_NOT_EXIST(107, "You can't follow if you do not exist"),
     FOLLOWED_ALREADY(108, "User already followed"),
     NOT_FOLLOWED(109, "User not followed"),
 

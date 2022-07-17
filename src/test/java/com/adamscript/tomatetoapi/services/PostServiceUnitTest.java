@@ -28,21 +28,25 @@ class PostServiceUnitTest {
     private PostService postService;
 
     private User user;
+    private Post post;
 
     @BeforeEach
     void initPostService(){
         postService = new PostService(postRepository, commentRepository, userRepository);
 
         user = new User();
+        user.setId("1");
         user.setUsername("eyesocketdisc");
         user.setDisplayName("EyeSocketDisc");
+
+        post = new Post();
+        post.setId(1);
+        post.setContent("Hi tomates! This is my first tomathought");
     }
 
     @Test
     void getPostInformation(){
-        Post post = new Post();
         post.setUser(user);
-        post.setContent("Hi tomates! This is my first tomathought");
 
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 
@@ -58,38 +62,21 @@ class PostServiceUnitTest {
 
     @Test
     void insertNewPost(){
-        Post post = new Post();
-        post.setContent("Hi tomates! This is my first tomathought");
-
-        when(userRepository.getById(anyString())).thenReturn(user);
+        when(principal.getName()).thenReturn(user.getId());
         when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
-        when(postRepository.save(post)).thenReturn(post);
 
         assertThat(postService.insert(post, principal).getCode()).isEqualTo(0);
     }
 
     @Test
-    void whenInsert_ifUserNull_thenReturnsError(){
-        Post post = new Post();
-
-        assertThat(postService.insert(post, principal).getCode()).isEqualTo(202);
-    }
-
-    @Test
     void whenInsert_ifContentNull_thenReturnsError(){
-        Post post = new Post();
-
-        when(userRepository.getById(anyString())).thenReturn(user);
+        post.setContent(null);
 
         assertThat(postService.insert(post, principal).getCode()).isEqualTo(203);
     }
 
     @Test
     void whenInsert_ifUserDoesNotExist_thenReturnsError(){
-        Post post = new Post();
-        post.setContent("Hi tomates! This is my first tomathought");
-
-        when(userRepository.getById(anyString())).thenReturn(user);
         when(userRepository.findById(anyString())).thenReturn(Optional.empty());
 
         assertThat(postService.insert(post, principal).getCode()).isEqualTo(102);
@@ -97,11 +84,10 @@ class PostServiceUnitTest {
 
     @Test
     void editPost(){
-        Post post = new Post();
-        post.setId(1);
-        post.setContent("Hi tomates! This is my first tomathought");
+        post.setUser(user);
 
-        when(userRepository.getById(anyString())).thenReturn(user);
+        when(principal.getName()).thenReturn(user.getId());
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 
         assertThat(postService.edit(post, principal).getCode()).isEqualTo(0);
@@ -109,10 +95,6 @@ class PostServiceUnitTest {
 
     @Test
     void ifPostDoesNotExist_thenReturnsError(){
-        Post post = new Post();
-        post.setUser(user);
-        post.setContent("Hi tomates! This is my first tomathought");
-
         when(postRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThat(postService.edit(post, principal).getCode()).isEqualTo(201);
@@ -120,36 +102,31 @@ class PostServiceUnitTest {
 
     @Test
     void whenEdit_ifPostNull_thenReturnsError(){
-        Post post = new Post();
-
+        post.setId(2);
         assertThat(postService.edit(post, principal).getCode()).isEqualTo(201);
     }
 
     @Test
     void whenEdit_ifContentNull_thenReturnsError(){
-        Post post = new Post();
-        post.setId(1);
-        post.setUser(user);
+        post.setContent(null);
 
         assertThat(postService.edit(post, principal).getCode()).isEqualTo(203);
     }
 
     @Test
     void likePost(){
-        Post post = new Post();
-
+        when(principal.getName()).thenReturn(user.getId());
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
         when(postRepository.findById(post.getId())).thenReturn(Optional.of(post));
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
         assertThat(postService.like(post.getId(), principal).getCode()).isEqualTo(0);
     }
 
     @Test
     void ifAlreadyLiked_thenReturnsError(){
-        Post post = new Post();
-
+        when(principal.getName()).thenReturn(user.getId());
         when(postRepository.findById(post.getId())).thenReturn(Optional.of(post));
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
         when(postRepository.findLike(post.getId(), Optional.of(user))).thenReturn(List.of(post));
 
         assertThat(postService.like(post.getId(), principal).getCode()).isEqualTo(204);
@@ -157,8 +134,6 @@ class PostServiceUnitTest {
 
     @Test
     void whenLike_ifPostDoesNotExist_thenReturnsError(){
-        Post post = new Post();
-
         when(postRepository.findById(post.getId())).thenReturn(Optional.empty());
 
         assertThat(postService.like(post.getId(), principal).getCode()).isEqualTo(201);
@@ -166,19 +141,17 @@ class PostServiceUnitTest {
 
     @Test
     void whenLike_ifUserDoesNotExist_thenReturnsError(){
-        Post post = new Post();
-
-        when(postRepository.findById(post.getId())).thenReturn(Optional.of(post));
-        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+        when(userRepository.findById(anyString())).thenReturn(Optional.empty());
 
         assertThat(postService.like(post.getId(), principal).getCode()).isEqualTo(102);
     }
 
     @Test
     void unlikePost(){
-        Post post = new Post();
-
+        when(principal.getName()).thenReturn(user.getId());
         when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
         when(postRepository.findLike(anyLong(), any())).thenReturn(List.of(post));
 
         assertThat(postService.unlike(post.getId(), principal).getCode()).isEqualTo(0);
@@ -186,7 +159,6 @@ class PostServiceUnitTest {
 
     @Test
     void ifAlreadyUnliked_thenReturnsError(){
-        Post post = new Post();
         when(postRepository.findLike(anyLong(), any())).thenReturn(List.of());
 
         assertThat(postService.unlike(post.getId(), principal).getCode()).isEqualTo(205);
@@ -194,8 +166,10 @@ class PostServiceUnitTest {
 
     @Test
     void deletePost(){
-        Post post = new Post();
+        post.setUser(user);
 
+        when(principal.getName()).thenReturn(user.getId());
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 
         assertThat(postService.delete(anyLong(), principal).getCode()).isEqualTo(0);

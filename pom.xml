@@ -14,7 +14,7 @@
     <name>tomateto-api</name>
     <description>tomateto-api</description>
     <properties>
-        <java.version>11</java.version>
+        <java.version>17</java.version>
     </properties>
 
     <dependencies>
@@ -50,6 +50,8 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>1.18.22</version>
+            <scope>compile</scope>
             <optional>true</optional>
         </dependency>
         <dependency>

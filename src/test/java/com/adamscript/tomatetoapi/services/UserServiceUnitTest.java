@@ -27,17 +27,26 @@ class UserServiceUnitTest {
 
     private UserService userService;
 
+    private User user;
+    private User user2;
+
     @BeforeEach
     void initUserService(){
         userService = new UserService(userRepository, postRepository, commentRepository);
+
+        user = new User();
+        user.setId("1");
+        user.setUsername("eyesocketdisc");
+        user.setDisplayName("EyeSocketDisc");
+
+        user2 = new User();
+        user2.setId("2");
+        user2.setUsername("eyesocketdisc2");
+        user2.setDisplayName("EyeSocketDisc2");
     }
 
     @Test
     void getUserInformation() {
-        User user = new User();
-        user.setUsername("eyesocketdisc");
-        user.setDisplayName("EyeSocketDisc");
-
         when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
 
         assertThat(userService.list("1").getCode()).isEqualTo(0);
@@ -52,13 +61,9 @@ class UserServiceUnitTest {
 
     @Test
     void insertNewUser() {
-        User user = new User();
-        user.setUsername("eyesocketdisc");
-        user.setDisplayName("EyeSocketDisc");
-
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenReturn(user);
-        when(principal.getName()).thenReturn("1");
+        when(principal.getName()).thenReturn(user.getId());
 
         Response newUser = userService.insert(user, principal);
 
@@ -67,10 +72,6 @@ class UserServiceUnitTest {
 
     @Test
     void whenInsert_ifUsernameAlreadyExists_thenReturnsError() {
-        User user = new User();
-        user.setUsername("eyesocketdisc");
-        user.setDisplayName("EyeSocketDisc");
-
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
 
         assertThat(userService.insert(user, principal).getCode()).isEqualTo(101);
@@ -78,29 +79,21 @@ class UserServiceUnitTest {
 
     @Test
     void whenInsert_ifNullValue_thenReturnsError() {
-        User user = new User();
+        user.setUsername(null);
 
         assertThat(userService.insert(user, principal).getCode()).isEqualTo(103);
     }
 
     @Test
     void editUser() {
-        User user = new User();
-        user.setUsername("eyesocketdisc");
-        user.setDisplayName("EyeSocketDisc");
-
         when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
-        when(principal.getName()).thenReturn("1");
+        when(principal.getName()).thenReturn(user.getId());
 
         assertThat(userService.edit(user, principal).getCode()).isEqualTo(0);
     }
 
     @Test
     void whenEdit_ifUsernameDoesNotExists_thenReturnsError() {
-        User user = new User();
-        user.setUsername("eyesocketdisc");
-        user.setDisplayName("EyeSocketDisc");
-
         when(userRepository.findById(anyString())).thenReturn(Optional.empty());
 
         assertThat(userService.edit(user, principal).getCode()).isEqualTo(102);
@@ -108,83 +101,74 @@ class UserServiceUnitTest {
 
     @Test
     void whenEdit_ifUsernameAlreadyUsed_thenReturnsError() {
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user2));
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+        when(principal.getName()).thenReturn(user.getId());
 
+        assertThat(userService.edit(user2, principal).getCode()).isEqualTo(101);
     }
 
     @Test
     void whenEdit_ifNullValue_thenReturnsError() {
-        User user = new User();
+        user.setUsername(null);
 
         assertThat(userService.edit(user, principal).getCode()).isEqualTo(103);
     }
 
     @Test
     void followAUser() {
-        User user1 = new User();
-        user1.setId("4");
+        when(principal.getName()).thenReturn(user.getId());
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userRepository.findById(user2.getId())).thenReturn(Optional.of(user2));
 
-        User user2 = new User();
-        user2.setId("5");
-
-        when(principal.getName()).thenReturn("5");
-        when(userRepository.findById("4")).thenReturn(Optional.of(user1));
-
-        assertThat(userService.follow("4L", principal).getCode()).isEqualTo(0);
+        assertThat(userService.follow(user2.getId(), principal).getCode()).isEqualTo(0);
     }
 
     @Test
     void ifFollowingYourself_thenReturnsError() {
-        User user = new User();
-        user.setId("4");
+        when(principal.getName()).thenReturn(user.getId());
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
 
-        when(principal.getName()).thenReturn("4");
-        when(userRepository.findById("4")).thenReturn(Optional.of(user));
-
-        assertThat(userService.follow("4", principal).getCode()).isEqualTo(105);
+        assertThat(userService.follow(user.getId(), principal).getCode()).isEqualTo(105);
     }
 
     @Test
     void ifFollowingNonExistingUser_thenReturnsError() {
-        User user = new User();
+        when(principal.getName()).thenReturn(user.getId());
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userRepository.findById(user2.getId())).thenReturn(Optional.empty());
 
-        when(principal.getName()).thenReturn("5");
-        when(userRepository.findById("4")).thenReturn(Optional.of(user));
-        when(userRepository.findById("5")).thenReturn(Optional.empty());
-
-        assertThat(userService.follow("4", principal).getCode()).isEqualTo(106);
+        assertThat(userService.follow(user2.getId(), principal).getCode()).isEqualTo(106);
     }
 
     @Test
     void ifFollowerUserDoesNotExist_thenReturnsError() {
-        User user = new User();
+        when(principal.getName()).thenReturn(user.getId());
+        when(userRepository.findById(user2.getId())).thenReturn(Optional.of(user2));
+        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
 
-        when(principal.getName()).thenReturn("4");
-        when(userRepository.findById("4")).thenReturn(Optional.of(user));
-        when(userRepository.findById("5")).thenReturn(Optional.empty());
-
-        assertThat(userService.follow("5", principal).getCode()).isEqualTo(107);
+        assertThat(userService.follow(user2.getId(), principal).getCode()).isEqualTo(107);
     }
 
     @Test
     void ifAlreadyFollowed_thenReturnsError() {
-        User user = new User();
-
-        when(principal.getName()).thenReturn("5");
-        when(userRepository.findById("4")).thenReturn(Optional.of(user));
-        when(userRepository.findById("5")).thenReturn(Optional.of(user));
+        when(principal.getName()).thenReturn(user.getId());
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userRepository.findById(user2.getId())).thenReturn(Optional.of(user2));
         when(userRepository.findFollow(anyString(), any())).thenReturn(List.of(user));
 
-        assertThat(userService.follow("4", principal).getCode()).isEqualTo(108);
+        assertThat(userService.follow(user2.getId(), principal).getCode()).isEqualTo(108);
     }
 
     @Test
     void unfollowAUser() {
-        User user = new User();
+        when(principal.getName()).thenReturn(user.getId());
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userRepository.findById(user2.getId())).thenReturn(Optional.of(user2));
 
-        when(principal.getName()).thenReturn("5");
         when(userRepository.findFollow(anyString(), any())).thenReturn(List.of(user));
 
-        assertThat(userService.unfollow("4", principal).getCode()).isEqualTo(0);
+        assertThat(userService.unfollow(user2.getId(), principal).getCode()).isEqualTo(0);
     }
 
     @Test

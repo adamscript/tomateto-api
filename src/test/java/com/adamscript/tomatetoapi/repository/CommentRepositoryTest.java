@@ -6,6 +6,7 @@ import com.adamscript.tomatetoapi.models.entities.User;
 import com.adamscript.tomatetoapi.models.repos.CommentRepository;
 import com.adamscript.tomatetoapi.models.repos.PostRepository;
 import com.adamscript.tomatetoapi.models.repos.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -31,14 +32,21 @@ public class CommentRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    @Test
-    void likeComment(){
-        Comment comment = new Comment();
+    private User user;
+    private Comment comment;
+
+    @BeforeEach
+    void initCommentRepository(){
+        comment = new Comment();
         entityManager.persist(comment);
 
-        User user = new User();
+        user = new User();
+        user.setId("user");
         entityManager.persist(user);
+    }
 
+    @Test
+    void likeComment(){
         commentRepository.likeComment(comment.getId(), user.getId());
 
         Comment likedComment = commentRepository.findById(comment.getId()).get();
@@ -50,12 +58,6 @@ public class CommentRepositoryTest {
 
     @Test
     void unlikeComment(){
-        Comment comment = new Comment();
-        entityManager.persist(comment);
-
-        User user = new User();
-        entityManager.persist(user);
-
         commentRepository.likeComment(comment.getId(), user.getId());
         commentRepository.unlikeComment(comment.getId(), user.getId());
 
@@ -68,12 +70,6 @@ public class CommentRepositoryTest {
 
     @Test
     void findLike(){
-        Comment comment = new Comment();
-        entityManager.persist(comment);
-
-        User user = new User();
-        entityManager.persist(user);
-
         commentRepository.likeComment(comment.getId(), user.getId());
 
         Optional<Comment> likedComment = commentRepository.findById(comment.getId());

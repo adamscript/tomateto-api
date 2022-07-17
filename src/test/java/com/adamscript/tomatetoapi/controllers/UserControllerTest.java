@@ -5,10 +5,12 @@ import com.adamscript.tomatetoapi.helpers.service.ServiceStatus;
 import com.adamscript.tomatetoapi.models.entities.User;
 import com.adamscript.tomatetoapi.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -18,6 +20,7 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -37,6 +40,22 @@ class UserControllerTest {
 
     @MockBean
     private Principal principal;
+
+    private User user;
+    private User user2;
+
+    @BeforeEach
+    void initUserController(){
+        user = new User();
+        user.setId("1");
+        user.setUsername("eyesocketdisc");
+        user.setDisplayName("EyeSocketDisc");
+
+        user2 = new User();
+        user2.setId("2");
+        user2.setUsername("eyesocketdisc2");
+        user2.setDisplayName("EyeSocketDisc2");
+    }
 
     @Test
     void getUserInformation() throws Exception {
@@ -83,6 +102,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser
     void insertNewUser() throws Exception {
         User user = new User();
         user.setUsername("eyesocketdisc");
@@ -93,6 +113,7 @@ class UserControllerTest {
         when(userService.insert(any(User.class), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(post("/api/user")
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -101,6 +122,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser
     void ifUsernameAlreadyExists_thenReturns409() throws Exception {
         User user = new User();
 
@@ -109,6 +131,7 @@ class UserControllerTest {
         when(userService.insert(any(User.class), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(post("/api/user")
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -116,6 +139,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser
     void whenInsertUser_ifFails_thenReturns400() throws Exception {
         User user = new User();
 
@@ -124,6 +148,7 @@ class UserControllerTest {
         when(userService.insert(any(User.class), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(post("/api/user")
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -131,6 +156,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser
     void editUser() throws Exception {
         User user = new User();
         user.setUsername("eyesocketdisc");
@@ -141,6 +167,7 @@ class UserControllerTest {
         when(userService.edit(any(User.class), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/user")
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -149,6 +176,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser
     void ifUsernameDoesNotExists_thenReturns404() throws Exception {
         User user = new User();
 
@@ -157,6 +185,7 @@ class UserControllerTest {
         when(userService.edit(any(User.class), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/user")
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -164,6 +193,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser
     void whenEditUser_ifFails_thenReturns400() throws Exception {
         User user = new User();
 
@@ -172,6 +202,7 @@ class UserControllerTest {
         when(userService.edit(any(User.class), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/user")
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -179,30 +210,29 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser
     void followAUser() throws Exception {
-        User user1 = new User();
-        User user2 = new User();
-
         Response response = new Response(null, ServiceStatus.SUCCESS);
 
         when(userService.follow(anyString(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/user/{id}/follow", user2.getId())
+                        .with(csrf())
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(user1)))
+                        .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
 
     @Test
+    @WithMockUser
     void whenFollow_ifFails_thenReturns400() throws Exception {
-        User user = new User();
-
         Response response = new Response(null, ServiceStatus.ERROR);
 
         when(userService.follow(anyString(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/user/{id}/follow", 4L)
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -210,30 +240,29 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser
     void unfollowAUser() throws Exception {
-        User user1 = new User();
-        User user2 = new User();
-
         Response response = new Response(null, ServiceStatus.SUCCESS);
 
         when(userService.unfollow(anyString(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/user/{id}/unfollow", user2.getId())
+                        .with(csrf())
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(user1)))
+                        .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
 
     @Test
+    @WithMockUser
     void whenUnfollow_ifFails_thenReturns400() throws Exception {
-        User user = new User();
-
         Response response = new Response(null, ServiceStatus.ERROR);
 
         when(userService.unfollow(anyString(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/user/{id}/unfollow", 4L)
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())

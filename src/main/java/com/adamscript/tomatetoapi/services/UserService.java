@@ -50,7 +50,7 @@ public class UserService {
     public Response insert(User user, Principal principal){
         Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
 
-        if(user.getUsername() == null){
+        if(user.getUsername() == null || user.getUsername() == ""){
             return new Response(null, ServiceStatus.USERNAME_EMPTY);
         }
         else if(user.getDisplayName() == null){
@@ -83,7 +83,7 @@ public class UserService {
         else if(insertedUser.isEmpty()){
             return new Response(null, ServiceStatus.USER_DOES_NOT_EXIST);
         }
-        else if(existingUser.isPresent() && existingUser.get().getUsername() != insertedUser.get().getUsername()){
+        else if(existingUser.isPresent() && existingUser.get().getId() != insertedUser.get().getId()){
             return new Response(null, ServiceStatus.USERNAME_ALREADY_EXIST);
         }
         else if(insertedUser.isPresent()){
