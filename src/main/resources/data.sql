@@ -1,17 +1,17 @@
 insert into users (id, username, display_name, bio, follow_count, followers_count, posts_count, date)
-values ('1', 'tabbyavery', 'Tabby Avery', 'Im not a cat', 0, 0, 0, CURRENT_DATE);
+values ('1', 'tabbyavery', 'Tabby Avery', 'Im not a cat', 0, 0, 0, CURRENT_TIMESTAMP);
 
 insert into users (id, username, display_name, bio, follow_count, followers_count, posts_count, date)
-values ('2', 'adamdarmawan', 'Adam Darmawawn', 'Creator of Tomateto', 0, 0, 0, CURRENT_DATE);
+values ('2', 'adamdarmawan', 'Adam Darmawawn', 'Creator of Tomateto', 0, 0, 0, CURRENT_TIMESTAMP );
 
 insert into users (id, username, display_name, bio, follow_count, followers_count, posts_count, date)
-values ('GsmTDjCaqvaYN1eszOqT3QmT7D73', 'helloworld', 'Hello World', 'Im a machine', 1, 1, 0, CURRENT_DATE);
+values ('GsmTDjCaqvaYN1eszOqT3QmT7D73', 'helloworld', 'Hello World', 'Im a machine', 1, 1, 0, CURRENT_TIMESTAMP );
 
 insert into users (id, username, display_name, bio, follow_count, followers_count, posts_count, date)
-values ('zNHgnv8t49VoszAMl83VhafMBMI3', 'helloworld2', 'Hello World 2.0', 'Im hello world but better', 1, 1, 0, CURRENT_DATE);
+values ('zNHgnv8t49VoszAMl83VhafMBMI3', 'helloworld2', 'Hello World 2.0', 'Im hello world but better', 1, 1, 0, CURRENT_TIMESTAMP );
 
 insert into users (id, username, display_name, bio, follow_count, followers_count, posts_count, date)
-values ('U1k7x5pBXXNleCHRqfRTYZkQlmD3', 'testing', 'Test Account', 'This is a test', 1, 1, 0, CURRENT_DATE);
+values ('U1k7x5pBXXNleCHRqfRTYZkQlmD3', 'testing', 'Test Account', 'This is a test', 1, 1, 0, CURRENT_TIMESTAMP );
 
 insert into post (users, content, likes_count, comments_count, is_edited, date)
 values ('U1k7x5pBXXNleCHRqfRTYZkQlmD3', 'Hello this is my first post', 2, 1, false, '2020-01-01');
