@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Append Database URL
-        run: echo -e '\n\nspring.datasource.url=jdbc:postgresql://localhost:5432/tomateto-db?user=root&password=root' >> */src/main/resource/application.properties
+        run: echo -e '\n\nspring.datasource.url=jdbc:postgresql://localhost:5432/tomateto-db?user=root&password=root' >> src/main/resources/application.properties
         
       - name: Set up JDK
         uses: actions/setup-java@v3
