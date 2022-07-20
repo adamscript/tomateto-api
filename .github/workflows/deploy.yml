@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      tags: ${{ steps.meta.outputs.tags[0] }}
+      tags: ${{ steps.image.outputs.nametag }}
 
     steps:
       - name: Checkout the Repository
@@ -25,9 +25,12 @@ jobs:
           images: ghcr.io/adamscript/tomateto-api
           tags: |
             type=semver,pattern={{version}}
+          flavor: |
+            latest=true
 
-      - run: echo ${{ steps.meta.outputs.tags }} | head -1
-      - run: echo ${{ steps.meta.outputs.tags }}
+      - name: Set image name
+        id: image
+        run: echo "::set-output name=nametag::${{ echo ${{ steps.meta.outputs.tags }} | head -1 }}"
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
