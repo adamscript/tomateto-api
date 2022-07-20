@@ -12,13 +12,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.security.Principal;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -37,34 +40,40 @@ public class CommentControllerTest {
     @MockBean
     private CommentService commentService;
 
+    @MockBean
+    private Principal principal;
+
     private User user;
     private Post post;
+    private Comment comment;
 
     @BeforeEach
     void initCommentController(){
         user = new User();
-        user.setId(3);
+        user.setId("3");
         user.setUsername("eyesocketdisc");
         user.setDisplayName("EyeSocketDisc");
 
         post = new Post();
         post.setId(4);
-        post.setUserId(user);
+        post.setUser(user);
         post.setContent("Hi tomates! This is my first tomathought");
+
+        comment = new Comment();
+        comment.setUser(user);
+        comment.setPost(post);
+        comment.setContent("And this is my first mini-tomathought, aka comment! ;)");
     }
 
     @Test
+    @WithMockUser
     void getCommentInformation() throws Exception {
-        Comment comment = new Comment();
-        comment.setUserId(user);
-        comment.setPostId(post);
-        comment.setContent("And this is my first mini-tomathought, aka comment! ;)");
-
         Response response = new Response(comment, ServiceStatus.SUCCESS);
 
         when(commentService.list(anyLong())).thenReturn(response);
 
         MvcResult mvcResult = mockMvc.perform(get("/api/comment/{id}", 1)
+                        .with(csrf())
                         .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -75,41 +84,42 @@ public class CommentControllerTest {
     }
 
     @Test
+    @WithMockUser
     void ifCommentNotFound_thenReturns404() throws Exception {
         Response response = new Response(null, ServiceStatus.COMMENT_NOT_FOUND);
 
         when(commentService.list(anyLong())).thenReturn(response);
 
         mockMvc.perform(get("/api/comment/{id}", 3)
+                        .with(csrf())
                         .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
 
     @Test
+    @WithMockUser
     void whenGetComment_ifFails_thenReturns400() throws Exception {
         Response response = new Response(null, ServiceStatus.ERROR);
 
         when(commentService.list(anyLong())).thenReturn(response);
 
         mockMvc.perform(get("/api/comment/{id}", 3)
+                        .with(csrf())
                         .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
 
     @Test
+    @WithMockUser
     void insertNewComment() throws Exception {
-        Comment comment = new Comment();
-        comment.setUserId(user);
-        comment.setPostId(post);
-        comment.setContent("And this is my first mini-tomathought, aka comment! ;)");
-
         Response response = new Response(comment, ServiceStatus.SUCCESS);
 
-        when(commentService.insert(any(Comment.class))).thenReturn(response);
+        when(commentService.insert(any(Comment.class), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(post("/api/comment")
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(comment)))
                 .andDo(print())
@@ -118,14 +128,14 @@ public class CommentControllerTest {
     }
 
     @Test
+    @WithMockUser
     void whenInsert_ifFails_thenReturns400() throws Exception {
-        Comment comment = new Comment();
-
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(commentService.insert(any(Comment.class))).thenReturn(response);
+        when(commentService.insert(any(Comment.class), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(post("/api/comment")
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(comment)))
                 .andDo(print())
@@ -133,14 +143,14 @@ public class CommentControllerTest {
     }
 
     @Test
+    @WithMockUser
     void likeComment() throws Exception {
-        Comment comment = new Comment();
-
         Response response = new Response(null, ServiceStatus.SUCCESS);
 
-        when(commentService.like(anyLong(), anyLong())).thenReturn(response);
+        when(commentService.like(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/comment/{id}/like", comment.getId())
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -148,14 +158,14 @@ public class CommentControllerTest {
     }
 
     @Test
+    @WithMockUser
     void whenLike_ifCommentNotFound_thenReturns404() throws Exception {
-        Comment comment = new Comment();
-
         Response response = new Response(null, ServiceStatus.COMMENT_NOT_FOUND);
 
-        when(commentService.like(anyLong(), anyLong())).thenReturn(response);
+        when(commentService.like(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/comment/{id}/like", comment.getId())
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -163,14 +173,14 @@ public class CommentControllerTest {
     }
 
     @Test
+    @WithMockUser
     void whenLike_ifFails_thenReturns400() throws Exception {
-        Comment comment = new Comment();
-
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(commentService.like(anyLong(), anyLong())).thenReturn(response);
+        when(commentService.like(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/comment/{id}/like", comment.getId())
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -178,14 +188,14 @@ public class CommentControllerTest {
     }
 
     @Test
+    @WithMockUser
     void unlikeComment() throws Exception {
-        Comment comment = new Comment();
-
         Response response = new Response(null, ServiceStatus.SUCCESS);
 
-        when(commentService.unlike(anyLong(), anyLong())).thenReturn(response);
+        when(commentService.unlike(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/comment/{id}/unlike", comment.getId())
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -193,14 +203,14 @@ public class CommentControllerTest {
     }
 
     @Test
+    @WithMockUser
     void whenUnlike_ifFails_thenReturns400() throws Exception {
-        Comment comment = new Comment();
-
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(commentService.unlike(anyLong(), anyLong())).thenReturn(response);
+        when(commentService.unlike(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/comment/{id}/unlike", comment.getId())
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -208,36 +218,42 @@ public class CommentControllerTest {
     }
 
     @Test
+    @WithMockUser
     void deleteComment() throws Exception {
         Response response = new Response(null, ServiceStatus.SUCCESS);
 
-        when(commentService.delete(anyLong())).thenReturn(response);
+        when(commentService.delete(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(delete("/api/comment/{id}/delete", 1)
+                        .with(csrf())
                         .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
 
     @Test
+    @WithMockUser
     void whenDelete_ifCommentNotFound_thenReturns404() throws Exception {
         Response response = new Response(null, ServiceStatus.COMMENT_NOT_FOUND);
 
-        when(commentService.delete(anyLong())).thenReturn(response);
+        when(commentService.delete(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(delete("/api/comment/{id}/delete", 1)
+                        .with(csrf())
                         .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
 
     @Test
+    @WithMockUser
     void whenDelete_ifFails_thenReturns400() throws Exception {
         Response response = new Response(null, ServiceStatus.ERROR);
 
-        when(commentService.delete(anyLong())).thenReturn(response);
+        when(commentService.delete(anyLong(), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(delete("/api/comment/{id}/delete", 1)
+                        .with(csrf())
                         .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isBadRequest());

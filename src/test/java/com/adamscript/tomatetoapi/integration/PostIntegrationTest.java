@@ -5,12 +5,18 @@ import com.adamscript.tomatetoapi.models.entities.User;
 import com.adamscript.tomatetoapi.models.repos.PostRepository;
 import com.adamscript.tomatetoapi.models.repos.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.event.annotation.BeforeTestClass;
+import org.springframework.test.context.event.annotation.BeforeTestMethod;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import javax.transaction.Transactional;
 
@@ -18,6 +24,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -29,6 +37,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class PostIntegrationTest {
 
     @Autowired
+    private WebApplicationContext context;
+
     private MockMvc mockMvc;
 
     @Autowired
@@ -41,25 +51,31 @@ public class PostIntegrationTest {
     private UserRepository userRepository;
 
     private User user;
+    private Post post;
 
     @BeforeEach
     void initPostIntegration(){
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .apply(springSecurity())
+                .build();
+
         user = new User();
-        user.setId(1);
+        user.setId("1");
         user.setUsername("eyesocketdisc");
         user.setDisplayName("EyeSocketDisc");
 
         userRepository.saveAndFlush(user);
+
+        post = new Post();
+        post.setUser(user);
+        post.setContent("Hi tomates! This is my first tomathought");
+
+        postRepository.saveAndFlush(post);
     }
 
     @Test
     void getPostInformation() throws Exception{
-        Post post = new Post();
-        post.setUserId(user);
-        post.setContent("Hi tomates! This is my first tomathought");
-
-        postRepository.saveAndFlush(post);
-
         mockMvc.perform(get("/api/post/{id}", post.getId())
                         .contentType("application/json"))
                 .andDo(print())
@@ -68,12 +84,10 @@ public class PostIntegrationTest {
     }
 
     @Test
+    @WithMockUser("1")
     void insertNewPost() throws Exception{
-        Post post = new Post();
-        post.setUserId(user);
-        post.setContent("Hi tomates! This is my first tomathought");
-
         mockMvc.perform(post("/api/post")
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(post)))
                 .andDo(print())
@@ -82,18 +96,14 @@ public class PostIntegrationTest {
     }
 
     @Test
+    @WithMockUser("1")
     void editPost() throws Exception{
-        Post post = new Post();
-        post.setUserId(user);
-        post.setContent("Hi tomates! This is my first tomathought");
-
-        postRepository.saveAndFlush(post);
-
         Post editedPost = new Post();
         editedPost.setId(post.getId());
         editedPost.setContent("Hello tomates! This is my first tomathought");
 
         mockMvc.perform(put("/api/post")
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(editedPost)))
                 .andDo(print())
@@ -102,14 +112,10 @@ public class PostIntegrationTest {
     }
 
     @Test
+    @WithMockUser("1")
     void likePost() throws Exception{
-        Post post = new Post();
-        User user = new User();
-
-        postRepository.save(post);
-        userRepository.save(user);
-
         mockMvc.perform(put("/api/post/{id}/like", post.getId())
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -122,18 +128,14 @@ public class PostIntegrationTest {
     }
 
     @Test
+    @WithMockUser("1")
     void unlikePost() throws Exception{
-        Post post = new Post();
-        User user = new User();
-
-        postRepository.save(post);
-        userRepository.save(user);
-
         //like newly created post first
         postRepository.likePost(post.getId(), user.getId());
 
         //then unlike it
         mockMvc.perform(put("/api/post/{id}/unlike", post.getId())
+                        .with(csrf())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -144,11 +146,10 @@ public class PostIntegrationTest {
     }
 
     @Test
+    @WithMockUser("1")
     void deletePost() throws Exception{
-        Post post = new Post();
-        postRepository.saveAndFlush(post);
-
         mockMvc.perform(delete("/api/post/{id}/delete", post.getId())
+                        .with(csrf())
                         .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isOk());

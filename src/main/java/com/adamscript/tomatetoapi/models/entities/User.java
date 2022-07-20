@@ -5,6 +5,11 @@ import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.search.annotations.ContainedIn;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -20,30 +25,40 @@ import java.util.Set;
         property = "id"
 )
 @Table(name = "users")
+@Indexed
 public class User implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @NotNull
+    private String id;
 
     @NotNull
     @Column(length = 17)
+    @Field(store = Store.YES)
     private String username;
 
     private Instant date;
 
     @NotNull
     @Column(length = 30)
+    @Field(store = Store.YES)
     private String displayName;
 
     @Column(length = 160)
+    @Field(store = Store.YES)
     private String bio;
 
-    private String avatar;
+    @Field(index = Index.NO, store = Store.YES)
+    private String avatarDefault;
+    @Field(index = Index.NO, store = Store.YES)
+    private String avatarMedium;
+    @Field(index = Index.NO, store = Store.YES)
+    private String avatarSmall;
+    @Field(index = Index.NO, store = Store.YES)
+    private String avatarExtrasmall;
 
     private long followCount;
 
-    //@JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "userFollow",
@@ -59,13 +74,14 @@ public class User implements Serializable {
     private Set<User> followers = new HashSet<>();
 
     private long postsCount;
-    @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Post> post = new HashSet<>();
 
     @ManyToMany(mappedBy = "likes")
     private Set<Post> likedPosts = new HashSet<>();
 
-    @OneToMany(mappedBy = "userId")
+    @OneToMany(mappedBy = "user")
     private Set<Comment> comment = new HashSet<>();
 
     @ManyToMany(mappedBy = "likes")

@@ -16,7 +16,7 @@ public enum ServiceStatus {
     DISPLAYNAME_EMPTY(104, "Name can't be empty"),
     FOLLOW_YOURSELF(105, "You can't follow yourself"),
     FOLLOW_DOES_NOT_EXIST(106, "You can't follow non existing user"),
-    FOLLOWER_DOES_NOT_EXIST(107, "You can't follow if you does not exist"),
+    FOLLOWER_DOES_NOT_EXIST(107, "You can't follow if you do not exist"),
     FOLLOWED_ALREADY(108, "User already followed"),
     NOT_FOLLOWED(109, "User not followed"),
 
@@ -37,8 +37,9 @@ public enum ServiceStatus {
     COMMENT_LIKED_ALREADY(305, "Comment already liked"),
     COMMENT_NOT_LIKED(306, "Comment not liked"),
 
-    //Unknown
-    ERROR(400, "An unknown error occurred");
+    //Error
+    ERROR(400, "An unknown error occurred"),
+    UNAUTHORIZED(401, "You are not authorized for this action");
 
     private final int code;
     private final String message;

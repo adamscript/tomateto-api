@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  run_tests:
+  run-tests:
     name: Testing
     runs-on: ubuntu-latest
     
@@ -28,11 +28,14 @@ jobs:
     steps:
       - name: Checkout the Repository
         uses: actions/checkout@v3
+
+      - name: Append Database URL
+        run: echo -e '\n\nspring.datasource.url=jdbc:postgresql://localhost:5432/tomateto-db?user=root&password=root' >> src/main/resources/application.properties
         
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          java-version: '17'
           distribution: 'temurin'
           cache: maven
           

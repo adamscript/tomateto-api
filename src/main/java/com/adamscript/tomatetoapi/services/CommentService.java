@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,19 +41,16 @@ public class CommentService {
     }
 
     //create comment
-    public Response insert(Comment comment){
-        if(comment.getUserId() == null){
-            return new Response(null, ServiceStatus.COMMENT_USER_EMPTY);
-        }
-        else if(comment.getPostId() == null){
+    public Response insert(Comment comment, Principal principal){
+        if(comment.getPost() == null){
             return new Response(null, ServiceStatus.COMMENT_POST_EMPTY);
         }
-        else if(comment.getContent() == null){
+        else if(comment.getContent() == null || comment.getContent() == ""){
             return new Response(null, ServiceStatus.COMMENT_CONTENT_EMPTY);
         }
-        else if(comment.getUserId() != null && comment.getPostId() != null && comment.getContent() != null){
-            Optional<User> user = userRepository.findById(comment.getUserId().getId());
-            Optional<Post> post = postRepository.findById(comment.getPostId().getId());
+        else if(comment.getPost() != null && comment.getContent() != null){
+            Optional<User> user = userRepository.findById(principal.getName());
+            Optional<Post> post = postRepository.findById(comment.getPost().getId());
 
             if(user.isEmpty()){
                 return new Response(null, ServiceStatus.USER_DOES_NOT_EXIST);
@@ -61,7 +59,11 @@ public class CommentService {
                 return new Response(null, ServiceStatus.POST_DOES_NOT_EXIST);
             }
             else if(user.isPresent() && post.isPresent()){
-                return new Response(commentRepository.save(comment), ServiceStatus.SUCCESS);
+                comment.setUser(user.get());
+                Comment response = commentRepository.save(comment);
+                setCommentCount(post.get());
+
+                return new Response(response, ServiceStatus.SUCCESS);
             }
             else{
                 return new Response(null, ServiceStatus.ERROR);
@@ -73,8 +75,8 @@ public class CommentService {
     }
 
     //like a comment
-    public Response like(long commentId, long userId){
-        Optional<User> user = userRepository.findById(userId);
+    public Response like(long commentId, Principal principal){
+        Optional<User> user = userRepository.findById(principal.getName());
         Optional<Comment> comment = commentRepository.findById(commentId);
 
         List<Comment> likedComment = commentRepository.findLike(commentId, user);
@@ -89,7 +91,9 @@ public class CommentService {
             return new Response(null, ServiceStatus.COMMENT_LIKED_ALREADY);
         }
         else if(likedComment.isEmpty()){
-            commentRepository.likeComment(commentId, userId);
+            commentRepository.likeComment(commentId, principal.getName());
+            setLikeCount(comment.get());
+
             return new Response(null, ServiceStatus.SUCCESS);
         }
         else{
@@ -98,8 +102,9 @@ public class CommentService {
     }
 
     //unlike a comment
-    public Response unlike(long commentId, long userId){
-        Optional<User> user = userRepository.findById(userId);
+    public Response unlike(long commentId, Principal principal){
+        Optional<User> user = userRepository.findById(principal.getName());
+        Optional<Comment> comment = commentRepository.findById(commentId);
 
         List<Comment> likedComment = commentRepository.findLike(commentId, user);
 
@@ -107,7 +112,9 @@ public class CommentService {
             return new Response(null, ServiceStatus.COMMENT_NOT_LIKED);
         }
         else if(!likedComment.isEmpty()){
-            commentRepository.unlikeComment(commentId, userId);
+            commentRepository.unlikeComment(commentId, principal.getName());
+            setLikeCount(comment.get());
+
             return new Response(null, ServiceStatus.SUCCESS);
         }
         else{
@@ -116,18 +123,35 @@ public class CommentService {
     }
 
     //deleting a comment
-    public Response delete(long id){
+    public Response delete(long id, Principal principal){
         Optional<Comment> comment = commentRepository.findById(id);
 
         if(comment.isEmpty()){
             return new Response(null, ServiceStatus.COMMENT_NOT_FOUND);
         }
+        else if(comment.get().getUser().getId() != userRepository.findById(principal.getName()).get().getId() || userRepository.findById(principal.getName()).isEmpty()){
+            return new Response(null, ServiceStatus.UNAUTHORIZED);
+        }
         else if(comment.isPresent()){
             commentRepository.deleteById(id);
+
+            Post post = postRepository.findById(comment.get().getPost().getId()).get();
+            setCommentCount(post);
+
             return new Response(null, ServiceStatus.SUCCESS);
         }
         else{
             return new Response(null, ServiceStatus.ERROR);
         }
+    }
+
+    private void setCommentCount(Post post){
+        post.setCommentsCount(postRepository.findComments(post).size());
+        postRepository.save(post);
+    }
+
+    private void setLikeCount(Comment comment){
+        comment.setLikesCount(commentRepository.findLikes(comment).size());
+        commentRepository.save(comment);
     }
 }
