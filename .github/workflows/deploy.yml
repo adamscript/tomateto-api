@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      tags: ${{ steps.meta.outputs.tags }}
+      tags: ${{ steps.meta.outputs.tags[0] }}
 
     steps:
       - name: Checkout the Repository
@@ -53,4 +53,4 @@ jobs:
         with:
           app-name: 'tomateto-api'
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          images: ghcr.io/adamscript/tomateto-api:${{ needs.build.outputs.tags[0] }}
+          images: ghcr.io/adamscript/tomateto-api:${{ needs.build.outputs.tags }}
