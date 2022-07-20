@@ -20,7 +20,7 @@ jobs:
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@4
+        uses: docker/metadata-action@v4
         with:
           images: ghcr.io/adamscript/tomateto-api
           tags: |
