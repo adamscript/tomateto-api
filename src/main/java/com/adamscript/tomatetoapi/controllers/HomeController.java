@@ -14,7 +14,9 @@ public class HomeController {
     public ResponseEntity getMessage(){
         String message = "Hello Tomates!\n" +
                 "\n" +
-                "Uhh... you're not supposed to be here. So if you somehow able to see this message, please let me know through github.com/adamscript, twitter.com/awantobreakfree, or adam@adamscript.com :)";
+                "Uhh... you're not supposed to be here. So if you somehow able to see this message, please let me know through github.com/adamscript, twitter.com/awantobreakfree, or adam@adamscript.com" +
+                "\n" +
+                "P.S. I may or may not get notified, better watch your back ;)";
 
         return new ResponseEntity(message, HttpStatus.OK);
     }
