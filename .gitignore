@@ -48,3 +48,5 @@ build/
 
 /home/adamscript/tomateto-api/com.adamscript.tomatetoapi.models.entities.Post
 /home/adamscript/tomateto-api/com.adamscript.tomatetoapi.models.entities.User
+
+src/main/resources/application.properties
