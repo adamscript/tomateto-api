@@ -16,7 +16,9 @@ public class HomeController {
                 "\n" +
                 "Uhh... you're not supposed to be here. So if you somehow able to see this message, please let me know through github.com/adamscript, twitter.com/awantobreakfree, or adam@adamscript.com" +
                 "\n" +
-                "P.S. I may or may not get notified, better watch your back ;)";
+                "P.S. I may or may not get notified, better watch your back ;)" +
+                "\n" +
+                "v1.0.1-beta";
 
         return new ResponseEntity(message, HttpStatus.OK);
     }
