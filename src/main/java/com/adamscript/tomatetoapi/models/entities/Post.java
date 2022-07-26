@@ -66,7 +66,7 @@ public class Post implements Serializable {
     @Field(index = Index.NO, store = Store.YES)
     private long commentsCount;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private Set<Comment> comments = new HashSet<>();
 
 }

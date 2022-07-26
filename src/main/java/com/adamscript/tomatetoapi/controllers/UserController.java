@@ -94,6 +94,18 @@ public class UserController {
         }
     }
 
+    @DeleteMapping("/delete")
+    public ResponseEntity delete(Principal principal){
+        Response response = userService.delete(principal);
+
+        if(response.getCode() == 0){
+            return new ResponseEntity(response, HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @GetMapping("/{username}/follows")
     public ResponseEntity listFollows(@PathVariable("username") String username, Principal principal){
         return new ResponseEntity(userService.listFollows(username, principal), HttpStatus.OK);
