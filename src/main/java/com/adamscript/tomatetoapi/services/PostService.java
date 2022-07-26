@@ -170,12 +170,20 @@ public class PostService {
     }
 
     public Response listContent(long id, Principal principal){
-        Post post = postRepository.findById(id).get();
-        PostContentDTO postContent = postRepository.findContent(post);
+        Optional<Post> post = postRepository.findById(id);
 
-        setPrincipalPropertiesOnPost(postContent, principal);
+        if(post.isEmpty()){
+            return new Response(null, ServiceStatus.POST_NOT_FOUND);
+        }
+        else if(post.isPresent()){
+            PostContentDTO postContent = postRepository.findContent(post.get());
+            setPrincipalPropertiesOnPost(postContent, principal);
 
-        return new Response(postContent, ServiceStatus.SUCCESS);
+            return new Response(postContent, ServiceStatus.SUCCESS);
+        }
+        else {
+            return new Response(null, ServiceStatus.ERROR);
+        }
     }
 
     public Response listContentComment(long id, Principal principal){
@@ -188,12 +196,20 @@ public class PostService {
     }
 
     public Response listContentLikes(long id, Principal principal){
-        Post post = postRepository.findById(id).get();
-        List<FeedUserDTO> feedUser = postRepository.findLikesByPost(post);
+        Optional<Post> post = postRepository.findById(id);
 
-        setPrincipalPropertiesOnFeedUser(feedUser, principal);
+        if(post.isEmpty()){
+            return new Response(null, ServiceStatus.POST_NOT_FOUND);
+        }
+        else if(post.isPresent()){
+            List<FeedUserDTO> feedUser = postRepository.findLikesByPost(post.get());
+            setPrincipalPropertiesOnFeedUser(feedUser, principal);
 
-        return new Response(feedUser, ServiceStatus.SUCCESS);
+            return new Response(feedUser, ServiceStatus.SUCCESS);
+        }
+        else {
+            return new Response(null, ServiceStatus.ERROR);
+        }
     }
 
     private void setLikeCount(Post post){

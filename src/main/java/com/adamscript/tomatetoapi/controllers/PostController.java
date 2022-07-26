@@ -110,7 +110,17 @@ public class PostController {
 
     @GetMapping("/content/{id}")
     public ResponseEntity listContent(@PathVariable("id") Long id, Principal principal){
-        return new ResponseEntity(postService.listContent(id, principal), HttpStatus.OK);
+        Response response = postService.listContent(id, principal);
+
+        if(response.getCode() == 0){
+            return new ResponseEntity(response, HttpStatus.OK);
+        }
+        else if(response.getCode() == 200){
+            return new ResponseEntity(response, HttpStatus.NOT_FOUND);
+        }
+        else{
+            return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/content/{id}/comments")
@@ -120,7 +130,17 @@ public class PostController {
 
     @GetMapping("/content/{id}/likes")
     public ResponseEntity listContentLikes(@PathVariable("id") Long id, Principal principal){
-        return new ResponseEntity(postService.listContentLikes(id, principal), HttpStatus.OK);
+        Response response = postService.listContentLikes(id, principal);
+
+        if(response.getCode() == 0){
+            return new ResponseEntity(response, HttpStatus.OK);
+        }
+        else if(response.getCode() == 200){
+            return new ResponseEntity(response, HttpStatus.NOT_FOUND);
+        }
+        else{
+            return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
+        }
     }
 
 }
