@@ -81,7 +81,7 @@ public class User implements Serializable {
     @ManyToMany(mappedBy = "likes")
     private Set<Post> likedPosts = new HashSet<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comment = new HashSet<>();
 
     @ManyToMany(mappedBy = "likes")

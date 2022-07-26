@@ -162,6 +162,21 @@ public class UserService {
         }
     }
 
+    public Response delete(Principal principal){
+        Optional<User> user = userRepository.findById(principal.getName());
+
+        if(user.isEmpty()){
+            return new Response(null, ServiceStatus.POST_NOT_FOUND);
+        }
+        else if(user.isPresent()){
+            userRepository.deleteById(principal.getName());
+            return new Response(null, ServiceStatus.SUCCESS);
+        }
+        else{
+            return new Response(null, ServiceStatus.ERROR);
+        }
+    }
+
     private void setProfileFollowCount(User followingUser, User followedUser){
         followingUser.setFollowCount(userRepository.findFollows(followingUser).size());
         followedUser.setFollowersCount(userRepository.findFollowers(followedUser).size());
