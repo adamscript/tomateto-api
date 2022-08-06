@@ -44,11 +44,31 @@ This API supports methods to list, insert, edit, delete, and many more that are 
 This object is used to handle bad requests made by users that could happen when the user modified the front end web app code through the browser developer tools to try to bypass a request validator (like trying to edit a post created by another user). The following JSON structure shows the format of a response:
 
 ```
-if(code){
-  return code;
-}
-else{
-  return null;
+{
+    "message": "Success!",
+    "code": 0,
+    "items": {
+        "id": 1,
+        "content": "First!",
+        "photo": null,
+        "date": "2022-07-26T17:52:22Z",
+        "likesCount": 2,
+        "commentsCount": 1,
+        "user": {
+            "displayName": "Adam Darmawan",
+            "id": "U2k7x5pBMXMleCHRqfRTYZkQlmD3",
+            "avatar": {
+                "small": "https://someurl",
+                "extraSmall": "https://someurl",
+                "default": "https://someurl",
+                "medium": "https://someurl"
+            },
+            "username": "adamscript"
+        },
+        "isEdited": false,
+        "isLiked": true,
+        "isMine": true
+    }
 }
 ```
 
