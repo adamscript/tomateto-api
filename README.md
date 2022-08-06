@@ -39,6 +39,53 @@ Here is the working live demo : <https://tomateto.com>
 ### Custom Response Object ([example code](https://github.com/adamscript/tomateto-api/blob/main/src/main/java/com/adamscript/tomatetoapi/helpers/handler/Response.java))
 This object is used to handle bad requests made by users that could happen when the user modified the front end web app code through the browser developer tools to try to bypass a request validator (like trying to edit a post created by another user).
 
+```
+if(code){
+  return code;
+}
+else{
+  return null;
+}
+```
+
+The following table identifies response codes and messages that the API returns. 
+
+[Example code](https://github.com/adamscript/tomateto-api/blob/main/src/main/java/com/adamscript/tomatetoapi/helpers/service/ServiceStatus.java)
+
+| Code | Message |
+| ---- | ------- |
+| General |
+| 0 | Success! |
+| User |
+| 100 | User not found |
+| 101 | Username already exists |
+| 102 | User does not exist (Invalid User ID) |
+| 103 | Username can't be empty |
+| 104 | Name can't be empty |
+| 105 | You can't follow yourself |
+| 106 | You can't follow non existing user |
+| 107 | You can't follow if you do not exist |
+| 108 | User already followed |
+| 109 | User not followed |
+| Post |
+| 200 | Post not found |
+| 201 | Post does not exist (Invalid Post ID) |
+| 202 | Post's user can't be empty |
+| 203 | Post's content can't be empty |
+| 204 | Post already liked |
+| 205 | Post not liked |
+| Comment |
+| 300 | Comment not found |
+| 301 | Comment does not exist (Invalid Comment ID) |
+| 302 | Comment's user can't be empty |
+| 303 | Comment's post can't be empty |
+| 304 | Comment's content can't be empty |
+| 305 | Comment already likedd |
+| 306 | Comment not liked |
+| Error |
+| 400 | An unknown error occured |
+| 401 | You are not authorized for this action |
+
 ### Data Transfer Object ([example code](https://github.com/adamscript/tomateto-api/blob/main/src/main/java/com/adamscript/tomatetoapi/models/dto/PostContentDTO.java))
 This is mainly used to solve the infinite recursion problem that happens when the requested data (in example, all top posts) contains a relation with another entity (in example, the user who created the posts). It also helps reduce the number of calls needed so the server can respond with all of the required data at once (in example, content of the post, name of the user who created the post, and like status of the post) without having to make separate calls for each data.
 
