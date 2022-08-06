@@ -36,8 +36,12 @@ Here is the working live demo : <https://tomateto.com>
 - [Azure Database for PostgreSQL](https://azure.microsoft.com/en-us/services/postgresql/)
 
 ## Features
+
+### API Request ([example code](https://github.com/adamscript/tomateto-api/blob/main/src/main/java/com/adamscript/tomatetoapi/controllers/PostController.java))
+This API supports methods to list, insert, edit, delete, and many more that are specific to a particular resource. The following file identifies methods for `Post` resources: [Example code](https://github.com/adamscript/tomateto-api/blob/main/src/main/java/com/adamscript/tomatetoapi/services/PostService.java)
+
 ### Custom Response Object ([example code](https://github.com/adamscript/tomateto-api/blob/main/src/main/java/com/adamscript/tomatetoapi/helpers/handler/Response.java))
-This object is used to handle bad requests made by users that could happen when the user modified the front end web app code through the browser developer tools to try to bypass a request validator (like trying to edit a post created by another user).
+This object is used to handle bad requests made by users that could happen when the user modified the front end web app code through the browser developer tools to try to bypass a request validator (like trying to edit a post created by another user). The following JSON structure shows the format of a response:
 
 ```
 if(code){
