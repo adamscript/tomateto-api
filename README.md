@@ -15,7 +15,7 @@
     <img src="https://img.shields.io/badge/demo-online-brightgreen" alt="demo-badge">
   </a>
   <a href="https://tomateto.com">
-    <img src="https://img.shields.io/badge/version-1.0.1--beta-green" alt="version-badge">
+    <img src="https://img.shields.io/badge/version-1.0.2--beta-green" alt="version-badge">
   </a>
 </p>
 
