@@ -18,7 +18,7 @@ public class HomeController {
                 "\n" +
                 "P.S. I may or may not get notified, better watch your back ;)" +
                 "\n" +
-                "v1.1.0-beta";
+                "v1.1.1-beta";
 
         return new ResponseEntity(message, HttpStatus.OK);
     }
